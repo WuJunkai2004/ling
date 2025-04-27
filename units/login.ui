@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Login</class>
- <widget class="QWidget" name="Login">
+ <class>Frame</class>
+ <widget class="QFrame" name="Frame">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Login</string>
+   <string>Frame</string>
   </property>
   <widget class="BodyLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>30</y>
+     <x>160</x>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -29,8 +29,8 @@
   <widget class="BodyLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>70</y>
+     <x>160</x>
+     <y>100</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -39,11 +39,24 @@
     <string>密码</string>
    </property>
   </widget>
+  <widget class="PushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>140</y>
+     <width>75</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>登录</string>
+   </property>
+  </widget>
   <widget class="LineEdit" name="lineEdit">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>30</y>
+     <x>230</x>
+     <y>60</y>
      <width>113</width>
      <height>21</height>
     </rect>
@@ -52,24 +65,11 @@
   <widget class="PasswordLineEdit" name="lineEdit_2">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>70</y>
+     <x>230</x>
+     <y>100</y>
      <width>113</width>
      <height>21</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="PushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>110</y>
-     <width>75</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>登录</string>
    </property>
   </widget>
  </widget>
