@@ -4,8 +4,6 @@ from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel, 
 from qfluentwidgets import FluentIcon as FIF
 from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from units.login import Ui_Frame as Ui_Login
-
 #import QFrame and QHBoxLayout from PyQt5.QtWidgets
 from PyQt5.QtWidgets import QFrame, QHBoxLayout
 #import AlignCenter from PyQt5.QtCore import Qt
@@ -13,7 +11,8 @@ from PyQt5.QtCore import Qt
 #import QIcon from PyQt5.QtGui
 from PyQt5.QtGui import QIcon
 
-from units.login import Ui_Frame as LoginFrame
+from units.home import Ui_Form as Frame_Home
+from units.info import Ui_Form as Frame_Info
 
 
 class Widget(QFrame):
@@ -35,34 +34,35 @@ class Widget(QFrame):
 
 class MyMainForm(FluentWindow):
     """ 主界面 """
-
     def __init__(self):
         super().__init__()
-
+        self.navigationInterface.setExpandWidth(250)
         # 创建子界面，实际使用时将 Widget 换成自己的子界面
-        self.homeInterface = Widget('Home Interface', self, LoginFrame)
-        self.musicInterface = Widget('Music Interface', self)
-        self.videoInterface = Widget('Video Interface', self)
+        self.homeInterface = Widget('Home Interface', self)
+        self.openInterface = Widget('Open Interface', self)
         self.settingInterface = Widget('Setting Interface', self)
         self.albumInterface = Widget('Album Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
+        self.aboutInterface = Widget('About Interface', self, Frame_Info)
 
         self.initNavigation()
         self.initWindow()
 
     def initNavigation(self):
         self.addSubInterface(self.homeInterface, FIF.HOME, 'Home')
-        self.addSubInterface(self.musicInterface, FIF.MUSIC, 'Music library')
-        self.addSubInterface(self.videoInterface, FIF.VIDEO, 'Video library')
+        self.addSubInterface(self.openInterface, FIF.VIEW, 'Open', NavigationItemPosition.SCROLL)
         self.navigationInterface.addSeparator()
-        self.addSubInterface(self.albumInterface, FIF.ALBUM, 'Albums', NavigationItemPosition.SCROLL)
-        self.addSubInterface(self.albumInterface1, FIF.ALBUM, 'Album 1', parent=self.albumInterface)
+        self.addSubInterface(self.albumInterface, FIF.HISTORY, '阅读历史', NavigationItemPosition.SCROLL)
+        self.addSubInterface(self.albumInterface1, FIF.BOOK_SHELF, 'Album 1', parent=self.albumInterface)
         self.addSubInterface(self.settingInterface, FIF.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.aboutInterface, FIF.INFO, 'About', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         self.resize(900, 700)
         self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
         self.setWindowTitle('灵犀摘')
+        self.navigationInterface.setMinimumExpandWidth(900)
+        self.navigationInterface.expand(useAni=False)
 
 
 if __name__ == "__main__":

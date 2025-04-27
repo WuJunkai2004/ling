@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>810</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="TitleLabel" name="label">
+       <property name="text">
+        <string>项目信息</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="BodyLabel" name="label_2">
+       <property name="text">
+        <string>产品名： 灵犀摘
+
+目标：区分前后端
+&gt; 前端：实现一个完整的pdf和部分caj格式的阅读器，并在此基础上实现
+     - 文档总结
+     - 思维导图
+     - 翻译（可选
+ 
+&gt; 后端：一些在前端计算困难或者部署困难的功能，移动到后端
+
+
+前端UI技术栈可选
+1. Python + PyQt
+    - 优势：python是我常用的开发语言，并且有大量的库支持
+    - 缺陷：需要学习PyQt
+    
+2. JavaScript + Electron（js+html+css）
+    - 优势：js也是我常用的开发语言，同时浏览器(electron)在实现阅读功能和与后端通讯时非常方便
+    - 缺陷：需要学习web开发三件套</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>开发人员
+
+三个人</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TitleLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+  <customwidget>
+   <class>BodyLabel</class>
+   <extends>QLabel</extends>
+   <header>qfluentwidgets</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
