@@ -5,6 +5,7 @@ A Modern Paper Reader By PyQt5
 using pyvenv
 ```bash
 pip install -r requirements.txt
+start.bat
 python main.py
 ```
 
