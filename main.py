@@ -11,7 +11,7 @@ from PyQt5.QtCore import Qt
 #import QIcon from PyQt5.QtGui
 from PyQt5.QtGui import QIcon
 
-from units.home import Ui_Form as Frame_Home
+#from units.home import Ui_Form as Frame_Home
 from units.info import Ui_Form as Frame_Info
 
 
@@ -32,7 +32,7 @@ class Widget(QFrame):
         self.setObjectName(text.replace(' ', '-'))
 
 
-class MyMainForm(FluentWindow):
+class MainWin(FluentWindow):
     """ 主界面 """
     def __init__(self):
         super().__init__()
@@ -40,9 +40,9 @@ class MyMainForm(FluentWindow):
         # 创建子界面，实际使用时将 Widget 换成自己的子界面
         self.homeInterface = Widget('Home Interface', self)
         self.openInterface = Widget('Open Interface', self)
-        self.settingInterface = Widget('Setting Interface', self)
         self.albumInterface = Widget('Album Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
+        self.settingInterface = Widget('Setting Interface', self)
         self.aboutInterface = Widget('About Interface', self, Frame_Info)
 
         self.initNavigation()
@@ -52,10 +52,10 @@ class MyMainForm(FluentWindow):
         self.addSubInterface(self.homeInterface, FIF.HOME, 'Home')
         self.addSubInterface(self.openInterface, FIF.VIEW, 'Open', NavigationItemPosition.SCROLL)
         self.navigationInterface.addSeparator()
-        self.addSubInterface(self.albumInterface, FIF.HISTORY, '阅读历史', NavigationItemPosition.SCROLL)
-        self.addSubInterface(self.albumInterface1, FIF.BOOK_SHELF, 'Album 1', parent=self.albumInterface)
-        self.addSubInterface(self.settingInterface, FIF.SETTING, 'Settings', NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.aboutInterface, FIF.INFO, 'About', NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.albumInterface,   FIF.HISTORY,    '阅读历史', NavigationItemPosition.SCROLL)
+        self.addSubInterface(self.albumInterface1,  FIF.BOOK_SHELF, 'Album 1',  parent=self.albumInterface)
+        self.addSubInterface(self.settingInterface, FIF.SETTING,    'Settings', NavigationItemPosition.BOTTOM)
+        self.addSubInterface(self.aboutInterface,   FIF.INFO,       'About', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         self.resize(900, 700)
@@ -66,11 +66,11 @@ class MyMainForm(FluentWindow):
 
 
 if __name__ == "__main__":
-    #固定的，PyQt5程序都需要QApplication对象。sys.argv是命令行参数列表，确保程序可以双击运行
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv)
     #初始化
-    myWin = MyMainForm()
+    win = MainWin()
     #将窗口控件显示在屏幕上
-    myWin.show()
+    win.show()
     #程序运行，sys.exit方法确保程序完整退出。
     sys.exit(app.exec_())
