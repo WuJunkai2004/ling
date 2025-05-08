@@ -13,9 +13,8 @@ from PyQt5.QtGui import QIcon
 
 #from units.home import Ui_Form as Frame_Home
 from units.info import Ui_Form as Frame_Info
-from units.open import Ui_Form as Frame_Open
+from views.open import Ui_Form as Frame_Open
 from units.home import Ui_Form as Frame_Home
-
 
 class Widget(QFrame):
     def __init__(self, text: str, parent, Frame = None):
