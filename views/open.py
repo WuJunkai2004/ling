@@ -9,6 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog, QPushButton # Add this import
+from qfluentwidgets import FolderListDialog
+
 
 
 class Ui_Form(object):
@@ -19,9 +22,6 @@ class Ui_Form(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.selectButton = QtWidgets.QPushButton(Form)
-        self.selectButton.setObjectName("selectButton")
-        self.horizontalLayout.addWidget(self.selectButton)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -33,16 +33,7 @@ class Ui_Form(object):
         self.pdfContainer.setSizePolicy(sizePolicy)
         self.pdfContainer.setObjectName("pdfContainer")
         self.verticalLayout.addWidget(self.pdfContainer)
-
-        self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
-
-    def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.selectButton.setText(_translate("Form", "选择PDF文件"))
-from qfluentwidgets import FolderListDialog
-
 
 if __name__ == "__main__":
     import sys
