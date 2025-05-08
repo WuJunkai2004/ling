@@ -13,6 +13,7 @@ from PyQt5.QtGui import QIcon
 
 #from units.home import Ui_Form as Frame_Home
 from units.info import Ui_Form as Frame_Info
+from units.open import Ui_Form as Frame_Open
 from units.home import Ui_Form as Frame_Home
 
 
@@ -39,7 +40,7 @@ class MainWin(FluentWindow):
         super().__init__()
         self.navigationInterface.setExpandWidth(250)
         # 创建子界面，实际使用时将 Widget 换成自己的子界面
-        self.homeInterface = Widget('Home Interface', self, Frame_Home)
+        self.homeInterface = Widget('Home Interface', self)
         self.openInterface = Widget('Open Interface', self)
         self.albumInterface = Widget('Album Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
