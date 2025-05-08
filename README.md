@@ -16,16 +16,16 @@ pip install pyqt5-tools
 ### Folder Structure
 ```bash
 ling
-- assets: for assets files
-- Lib: for python libraries, ignore this folder
-- scripts: for python venvironment scripts, ignore this folder
-- units: for pyqt5 ui files, should be compiled to python scripts
-- views: for python scripts, use pyqt5 components to build the ui
-- main.py: the entry point of the program
-- start.bat: the script to compile the pyqt5 ui files to python scripts, and run the program
-- README.md: this file
-- requirements.txt: the python dependencies of the project
-- .gitignore: the git ignore file
+- assets: 资源文件夹，存放图片和图标等资源
+- Lib: python虚拟环境的Lib文件夹，存放python的标准库和第三方库
+- scripts: python虚拟环境的Scripts文件夹，存放python的可执行文件和脚本
+- views: UI文件夹，存放所有的UI文件。需要pyuic5编译成python脚本后调用
+- units: 组件文件夹，存放ui文件对应的组件。组件仅重写了对应信号槽函数，其他的功能都交给了原组件
+- main.py: 主程序文件，程序的入口
+- start.bat: 启动脚本，编译ui文件并运行主程序
+- README.md: 项目说明文件
+- requirements.txt: python依赖文件列表
+- .gitignore: git忽略文件
 ```
 
 # 关于信号和信号槽

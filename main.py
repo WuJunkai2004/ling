@@ -11,10 +11,9 @@ from PyQt5.QtCore import Qt
 #import QIcon from PyQt5.QtGui
 from PyQt5.QtGui import QIcon
 
-#from units.home import Ui_Form as Frame_Home
-from units.info import Ui_Form as Frame_Info
-from units.open import Ui_Form as Frame_Open
-from units.home import Ui_Form as Frame_Home
+from views.info import Ui_Form as Form_Info
+from views.open import Ui_Form as Form_Open
+from views.home import Ui_Form as Form_Home
 
 class Widget(QFrame):
     def __init__(self, text: str, parent, Frame = None):
@@ -39,13 +38,13 @@ class MainWin(FluentWindow):
         super().__init__()
         self.navigationInterface.setExpandWidth(250)
 
-        self.homeInterface = Widget('Home Interface', self, Frame_Home)
-        self.openInterface = Widget('Open Interface', self, Frame_Open)
+        self.homeInterface = Widget('Home Interface', self, Form_Home)
+        self.openInterface = Widget('Open Interface', self, Form_Open)
         self.histInterface = Widget('History Interface', self)
         self.markInterface = Widget('mark Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
         self.setsInterface = Widget('Setting Interface', self)
-        self.infoInterface = Widget('Info Interface', self, Frame_Info)
+        self.infoInterface = Widget('Info Interface', self, Form_Info)
 
         self.initNavigation()
         self.initWindow()

@@ -176,7 +176,7 @@ alignment: center;</string>
   <customwidget>
    <class>open_select_button</class>
    <extends>QPushButton</extends>
-   <header>slots</header>
+   <header>units.open</header>
    <slots>
     <slot>be_click()</slot>
    </slots>
