@@ -27,3 +27,8 @@ ling
 - requirements.txt: the python dependencies of the project
 - .gitignore: the git ignore file
 ```
+
+# 关于信号和信号槽
+我们决定继续使用信号和信号槽的机制来实现组件之间的通信。
+所以有了slots.py这个文件。
+该文件中继承了很多组件，并且添加了对应的信号槽函数。

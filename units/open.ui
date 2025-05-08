@@ -52,7 +52,7 @@
       <widget class="LineEdit" name="lineEdit"/>
      </item>
      <item>
-      <widget class="PushButton" name="selectButton">
+      <widget class="open_select_button" name="selectButton">
        <property name="text">
         <string>选择PDF文件</string>
        </property>
@@ -169,16 +169,52 @@ alignment: center;</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PushButton</class>
-   <extends>QPushButton</extends>
-   <header>qfluentwidgets</header>
-  </customwidget>
-  <customwidget>
    <class>LineEdit</class>
    <extends>QLineEdit</extends>
    <header>qfluentwidgets</header>
   </customwidget>
+  <customwidget>
+   <class>open_select_button</class>
+   <extends>QPushButton</extends>
+   <header>slots</header>
+   <slots>
+    <slot>be_click()</slot>
+   </slots>
+  </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>selectButton</receiver>
+   <slot>change_text()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>384</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>757</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>selectButton</sender>
+   <signal>clicked()</signal>
+   <receiver>selectButton</receiver>
+   <slot>be_click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>740</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>773</x>
+     <y>57</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
