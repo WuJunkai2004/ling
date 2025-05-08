@@ -13,10 +13,11 @@ from PyQt5.QtGui import QIcon
 
 #from units.home import Ui_Form as Frame_Home
 from units.info import Ui_Form as Frame_Info
+from units.home import Ui_Form as Frame_Home
 
 
 class Widget(QFrame):
-    def __init__(self, text: str, parent=None, Frame: QFrame = None):
+    def __init__(self, text: str, parent, Frame = None):
         super().__init__(parent=parent)
         if Frame is None:
             self.label = SubtitleLabel(text, self)
@@ -38,7 +39,7 @@ class MainWin(FluentWindow):
         super().__init__()
         self.navigationInterface.setExpandWidth(250)
         # 创建子界面，实际使用时将 Widget 换成自己的子界面
-        self.homeInterface = Widget('Home Interface', self)
+        self.homeInterface = Widget('Home Interface', self, Frame_Home)
         self.openInterface = Widget('Open Interface', self)
         self.albumInterface = Widget('Album Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
