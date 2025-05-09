@@ -27,7 +27,6 @@ class Widget(QFrame):
         else:
             ui = Frame()
             ui.setupUi(self)
-
         # 必须给子界面设置全局唯一的对象名
         self.setObjectName(text.replace(' ', '-'))
 
@@ -38,30 +37,20 @@ class MainWin(FluentWindow):
         super().__init__()
         self.navigationInterface.setExpandWidth(250)
 
-        self.homeInterface = Widget('Home Interface', self, Form_Home)
-        self.openInterface = Widget('Open Interface', self, Form_Open)
-        self.readInterface = Widget('Read Interface', self)
-        self.histInterface = Widget('History Interface', self)
-        self.markInterface = Widget('mark Interface', self)
-        self.albumInterface1 = Widget('Album Interface 1', self)
-        self.setsInterface = Widget('Setting Interface', self)
-        self.infoInterface = Widget('Info Interface', self, Form_Info)
+        self.interface = {}
 
-        self.initNavigation()
+        self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
+        self.setInterface('open', '打开文件',   form=Form_Open, icon=FIF.VIEW)
+        self.setInterface('hist', '阅读历史',   form=None,      icon=FIF.HISTORY)
+        self.setSeparator('read-separator')
+        self.setInterface('read', '正在阅读',   form=None,      icon=FIF.EDIT)
+        self.setSeparator('mark-separator')
+        self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
+        self.setSeparator('bottom-separator')
+        self.setInterface('sets', '设置',       form=None,      icon=FIF.SETTING)
+        self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO)
+
         self.initWindow()
-
-    def initNavigation(self):
-        # 设置导航栏的标题和图标
-        self.addSubInterface(self.homeInterface, FIF.HOME,      '首页')
-        self.addSubInterface(self.openInterface, FIF.VIEW,      '打开文件')
-        self.addSubInterface(self.readInterface, FIF.EDIT,      '正在阅读')
-        self.addSubInterface(self.histInterface, FIF.HISTORY,   '阅读历史')
-        self.navigationInterface.addSeparator()
-        self.addSubInterface(self.markInterface, FIF.BOOK_SHELF,'收藏', NavigationItemPosition.SCROLL)
-        self.addSubInterface(self.albumInterface1,  FIF.BOOK_SHELF, 'Album 1',  parent=self.markInterface)
-        self.navigationInterface.addSeparator(NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.setsInterface, FIF.SETTING,   '设置', NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.infoInterface, FIF.INFO,      '关于', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         # 设置窗口的最小宽度和高度
@@ -70,7 +59,20 @@ class MainWin(FluentWindow):
         self.setWindowTitle('灵犀摘')
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
-        # 隐藏 正在阅读
+
+    def setInterface(self, name: str, text: str, /, *, form: Widget = None, 
+                     icon: QIcon = QIcon(), parent=None, position=NavigationItemPosition.TOP):
+        widget = Widget(name, self, form)
+        self.interface[name] = {
+            'widget': widget,
+            'interface': self.addSubInterface(widget, icon, text, parent=parent, position=position)
+        }
+
+    def setSeparator(self, name:str, position: NavigationItemPosition = NavigationItemPosition.TOP):
+        self.interface[name] = {
+            'widget': None,
+            'interface': self.navigationInterface.addSeparator(position=position)
+        }
 
     def openFile(self, file_path):
         # 打开文件的逻辑
