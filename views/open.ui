@@ -32,6 +32,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMinimumSize</enum>
+     </property>
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
@@ -49,12 +52,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="LineEdit" name="lineEdit"/>
+      <widget class="LineEdit" name="lineEdit">
+       <property name="placeholderText">
+        <string>输入文件地址</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="open_select_button" name="selectButton">
        <property name="text">
-        <string>选择PDF文件</string>
+        <string>选择文件</string>
        </property>
       </widget>
      </item>
@@ -94,6 +101,9 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -111,23 +121,19 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="plainTextEdit">
+      <widget class="file_get_label" name="label">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(235, 255, 255);
-font: 28pt &quot;微软雅黑&quot;;
-alignment: center;</string>
+        <string notr="true">font: 28pt &quot;微软雅黑&quot;;
+background-color: rgb(235, 235, 235);</string>
        </property>
-       <property name="undoRedoEnabled">
-        <bool>false</bool>
+       <property name="text">
+        <string>请将文件拖拽至此</string>
        </property>
-       <property name="readOnly">
-        <bool>true</bool>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
        </property>
-       <property name="plainText">
-        <string>请把文件拖拽至此</string>
-       </property>
-       <property name="centerOnScroll">
-        <bool>true</bool>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -155,7 +161,7 @@ alignment: center;</string>
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
+      <enum>QSizePolicy::Fixed</enum>
      </property>
      <property name="sizeHint" stdset="0">
       <size>
@@ -180,6 +186,11 @@ alignment: center;</string>
    <slots>
     <slot>be_click()</slot>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>file_get_label</class>
+   <extends>QLabel</extends>
+   <header>units.open</header>
   </customwidget>
  </customwidgets>
  <resources/>
