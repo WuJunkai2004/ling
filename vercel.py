@@ -7,6 +7,7 @@ import io
 import json
 import os
 import sys
+import re
 
 
 class ErrorStatu:
@@ -110,19 +111,69 @@ class DATA(server.SimpleHTTPRequestHandler):
         else:
             return xml.parsers(data)
 
-    def parse_data(self, data):
+    def parse_data(self, data: bytearray):
+        def bytesplit(data: bytes, sep: bytes):
+            '分割数据块'
+            start = 0
+            for cur in range(len(data) - len(sep) + 1):
+                if data[cur] == sep[0] and data[cur + 1] == sep[1] \
+                and data[cur:cur + len(sep)] == sep:
+                    yield data[start:cur]
+                    start = cur + len(sep)
+            yield data[start:]
+        def bytepack(data: bytearray):
+            '将字节打包成字典'
+            result = {
+                "Content-Disposition": "",
+                "name": "",
+                "filename": "",
+                "Content-Type": "",
+                "Content" : None    # io.BytesIO()
+            }
+            void_line = 0
+            data_start = 0
+            for item in bytesplit(data, b'\r\n'):
+                if void_line == 2:
+                    result["Content"] = io.BytesIO(data[data_start:])
+                    break
+                else:
+                    data_start += len(item) + 2
+                if item.startswith(b'Content-Disposition:'):
+                    attr = item.split(b';')
+                    result["Content-Disposition"] = attr[0]
+                    for i in range(1, len(attr)):
+                        attr[i] = attr[i].strip()
+                        if attr[i].startswith(b'name='):
+                            result["name"] = attr[i][6:-1]
+                        elif attr[i].startswith(b'filename='):
+                            result["filename"] = attr[i][10:-1].decode()
+                elif item.startswith(b'Content-Type:'):
+                    result["Content-Type"] = item[14:]
+                elif item == b'':
+                    void_line += 1
+            return result
+            
         '解析 multipart/form-data 数据'
-        data = data.decode()
-        boundary = data.split('\r\n')[0]
-        data = data.split('\r\n')[1:]
-        #list = re.split(boundary,data)
-        print('c=',data)
-        try:
-            print(data)
-        except:
-            ErrorStatu(self,415)
-            raise TypeError('415 Unsupported Media Type')
-        return data
+        # 获取 boundary
+        boundary = ''
+        for item in bytesplit(data, b'\r\n'):
+            if item.startswith(b'--'):
+                boundary = item
+                break
+        if not boundary:
+            # 如果没有找到 boundary，返回错误
+            ErrorStatu(self, 400, 'Bad Request')
+            return
+        print('boundary:', boundary)
+
+        # 分割数据块并解析
+        result = []
+        for part in bytesplit(data, boundary):
+            if len(part) <= 2 or part.startswith(b'--'):
+                continue
+            result.append(bytepack(part))
+        return result
+
 
 #============ data translate ============#
     def translate_post(self):
@@ -194,12 +245,15 @@ class SEND(server.SimpleHTTPRequestHandler):
 class API(URL, DATA, COOKIE, SEND):
     server_version = 'vercelHTTP/1.0'
     def do_GET(self):
+        self.method = 'GET'
         self.vercel(self.translate_path(), self.translate_args(), self.headers)
 
     def do_POST(self):
+        self.method = 'POST'
         self.vercel(self.translate_path(), self.translate_post(), self.headers)
 
     def do_HEAD(self):
+        self.method = 'HEAD'
         self.vercel(self.translate_path(), self.translate_post(), self.headers)
 
     def do_OPTIONS(self):
