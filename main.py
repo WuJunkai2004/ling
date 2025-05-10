@@ -1,25 +1,18 @@
 import sys
-import requests
-import os
 import time
+import requests
 
-from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel, setFont
+from PyQt5.QtCore    import Qt
+from PyQt5.QtGui     import QIcon, QColor, QFont
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
+
 from qfluentwidgets import FluentIcon as FIF
-from PyQt5.QtWidgets import QApplication
+from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel
 
-#import QFrame and QHBoxLayout from PyQt5.QtWidgets
-from PyQt5.QtWidgets import QFrame, QHBoxLayout
-#import AlignCenter from PyQt5.QtCore import Qt
-from PyQt5.QtCore import Qt
-#import QIcon from PyQt5.QtGui
-from PyQt5.QtGui import QIcon, QColor
-
+from views.home import Ui_Form as Form_Home
 from views.info import Ui_Form as Form_Info
 from views.open import Ui_Form as Form_Open
-from views.home import Ui_Form as Form_Home
 from views.read import Ui_Form as Form_Read
-
-from qframelesswindow.webengine import FramelessWebEngineView
 
 import units.utils as utils
 
@@ -29,7 +22,7 @@ class Widget(QFrame):
         if Frame is None:
             self.label = SubtitleLabel(text, self)
             self.hBoxLayout = QHBoxLayout(self)
-            setFont(self.label, 24)
+            self.label.setFont(QFont('Microsoft YaHei', 24))
             self.label.setAlignment(Qt.AlignCenter)
             self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
         else:
