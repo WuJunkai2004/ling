@@ -24,6 +24,8 @@ class CustomWebEnginePage(QWebEnginePage):
 class reader(QWidget): # Changed base class to QWidget
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.chat_history = [] # Initialize chat history
+        self.current_url = ""
 
         # Main layout
         self.layout = QHBoxLayout(self)
@@ -74,6 +76,7 @@ class reader(QWidget): # Changed base class to QWidget
         print("openUrl in read.reader")
         print(f"http://47.121.28.18:8000/var/html/{token}.html")
         url = QUrl(f"http://47.121.28.18:8000/var/html/{token}.html")
+        self.current_url = url.toString() # Store the current URL
         self.pdf_viewer.setUrl(url)
         self.pdf_viewer.load(url)
         self.pdf_viewer.show()
@@ -114,13 +117,18 @@ class reader(QWidget): # Changed base class to QWidget
             "Content-Type": "application/json"
         }
 
+        # Add user message to history
+        self.chat_history.append({"role": "user", "content": user_text})
+
         # 构建请求体，使其符合OpenAI兼容模式
+        # Include previous messages from chat_history, ensuring not to exceed token limits if necessary (not implemented here for brevity)
+        messages_to_send = [
+            {"role": "system", "content": "You are a helpful assistant."}
+        ] + self.chat_history
+
         payload = {
             "model": "qwen-turbo",  # 或者其他您选用的模型
-            "messages": [
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_text}
-            ]
+            "messages": messages_to_send
             # "parameters": {} # 根据通义千问兼容模式文档，此字段可能不需要或有特定支持的参数
         }
 
@@ -150,6 +158,8 @@ class reader(QWidget): # Changed base class to QWidget
                 cursor.deletePreviousChar() # Remove the newline if any
 
             self.chat_display.append(f"LLM: {llm_reply}")
+            # Add LLM reply to history
+            self.chat_history.append({"role": "assistant", "content": llm_reply})
 
         except requests.exceptions.RequestException as e:
             # Remove the "正在思考中..." message if it was the last one
