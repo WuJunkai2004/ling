@@ -33,30 +33,30 @@ def handler(self: vercel.API, url, data, headers):
     md5  = get_md5(file['Content'])
     db   = dblite.SQL('./var/datas.db')
     find = db['files']['md5'].index(md5)
-    if find != -1:
-        # File already exists, 
-        # return the json with the file name and the md5 and file token
-        file_info = db['files'][find]
-        self.send_code(200)
-        self.send_headers({
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        })
-        self.send_text(json.dumps({
-            'filename': file_info['filename'],
-            'md5': md5,
-            'token': md5,
-        }))
-        return
-    file["Content"].seek(0)
-    # 拼接对应的后缀名
-    path = os.path.join('./var/files', md5 + os.path.splitext(file['filename'])[1])
-    with open(path, 'wb') as f:
-        self.copyfile(file['Content'], f)
-    # 记录文件信息
-    db['files'].insert({
-        'filename': md5 + os.path.splitext(file['filename'])[1],
-        'md5': md5,
+    if find == -1:
+        file["Content"].seek(0)
+        # 拼接对应的后缀名
+        path = os.path.join('./var/files', md5 + os.path.splitext(file['filename'])[1])
+        with open(path, 'wb') as f:
+            self.copyfile(file['Content'], f)
+        # 记录文件信息
+        db['files'].insert(file['filename'],
+                        md5 + os.path.splitext(file['filename'])[1],
+                        md5,
+        )
+        file_info = md5 + os.path.splitext(file['filename'])[1]
+    else:
+        file_info = db['files']['filename'][find]
+
+    self.send_code(200)
+    self.send_headers({
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
     })
-    db.commit()
+    self.send_text(json.dumps({
+        'filename': file_info,
+        'md5': md5,
+        'token': md5,
+    }))
     db.close()
+    return

@@ -1,6 +1,6 @@
 # Author: WuJunkai2004
 # Update: 2025-05-10
-# Version: 1.1.1
+# Version: 1.1.2
 
 
 import sqlite3
@@ -70,8 +70,14 @@ class TABLE:
     def filder(self, __filder):
         pass
 
+    def add_conlumn(self, __name):
+        self.cursor.execute("ALTER TABLE {} ADD COLUMN {}".format(self.name, __name))
+
     def del_line(self, __id):
         self.cursor.execute("DELETE FROM {} WHERE oid={}".format(self.name, __id))
+
+    def del_table(self):
+        self.cursor.execute("DROP TABLE {}".format(self.name))
 
 
 
@@ -79,12 +85,14 @@ class SQL:
     def __init__(self, file = defined) -> None: 
         self.connect = sqlite3.connect(file)
         self.cursor  = self.connect.cursor()
+        self.status  = 'open'
 
     def __getitem__(self, __name) -> TABLE:
         return TABLE(self.cursor, __name)
         
     def __del__(self) -> None:
-        self.close()
+        if(self.status == 'open'):
+            self.close()
 
     def commit(self):
         self.connect.commit()
@@ -96,6 +104,7 @@ class SQL:
         self.connect.commit()
         self.cursor .close()
         self.connect.close()
+        self.status = 'close'
 
 
 def _shell():
