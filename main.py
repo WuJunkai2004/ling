@@ -40,7 +40,6 @@ class MainWin(FluentWindow):
 
         self.homeInterface = Widget('Home Interface', self, Form_Home)
         self.openInterface = Widget('Open Interface', self, Form_Open)
-        self.readInterface = Widget('Read Interface', self)
         self.histInterface = Widget('History Interface', self)
         self.markInterface = Widget('mark Interface', self)
         self.albumInterface1 = Widget('Album Interface 1', self)
@@ -51,10 +50,8 @@ class MainWin(FluentWindow):
         self.initWindow()
 
     def initNavigation(self):
-        # 设置导航栏的标题和图标
         self.addSubInterface(self.homeInterface, FIF.HOME,      '首页')
         self.addSubInterface(self.openInterface, FIF.VIEW,      '打开文件')
-        self.addSubInterface(self.readInterface, FIF.EDIT,      '正在阅读')
         self.addSubInterface(self.histInterface, FIF.HISTORY,   '阅读历史')
         self.navigationInterface.addSeparator()
         self.addSubInterface(self.markInterface, FIF.BOOK_SHELF,'收藏', NavigationItemPosition.SCROLL)
@@ -64,17 +61,11 @@ class MainWin(FluentWindow):
         self.addSubInterface(self.infoInterface, FIF.INFO,      '关于', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
-        # 设置窗口的最小宽度和高度
         self.resize(900, 700)
         self.setWindowIcon(QIcon('./assets/icon.ico'))
         self.setWindowTitle('灵犀摘')
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
-        # 隐藏 正在阅读
-
-    def openFile(self, file_path):
-        # 打开文件的逻辑
-        print("open file: ", file_path)
 
 
 if __name__ == "__main__":
