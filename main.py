@@ -1,4 +1,6 @@
 import sys
+import requests
+import os
 
 from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel, setFont
 from qfluentwidgets import FluentIcon as FIF
@@ -9,11 +11,16 @@ from PyQt5.QtWidgets import QFrame, QHBoxLayout
 #import AlignCenter from PyQt5.QtCore import Qt
 from PyQt5.QtCore import Qt
 #import QIcon from PyQt5.QtGui
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QColor
 
 from views.info import Ui_Form as Form_Info
 from views.open import Ui_Form as Form_Open
 from views.home import Ui_Form as Form_Home
+from views.read import Ui_Form as Form_Read
+
+from qframelesswindow.webengine import FramelessWebEngineView
+
+import units.utils as utils
 
 class Widget(QFrame):
     def __init__(self, text: str, parent, Frame = None):
@@ -38,19 +45,23 @@ class MainWin(FluentWindow):
         self.navigationInterface.setExpandWidth(250)
 
         self.interface = {}
+        self.reading   = {}
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
         self.setInterface('open', '打开文件',   form=Form_Open, icon=FIF.VIEW)
-        self.setInterface('hist', '阅读历史',   form=None,      icon=FIF.HISTORY)
-        self.setSeparator('read-separator')
+        self.setInterface('hist', '阅读历史',   form=Form_Read, icon=FIF.HISTORY)
+        self.set_________()
         self.setInterface('read', '正在阅读',   form=None,      icon=FIF.EDIT)
-        self.setSeparator('mark-separator')
+        self.set_________()
         self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
-        self.setSeparator('bottom-separator')
-        self.setInterface('sets', '设置',       form=None,      icon=FIF.SETTING)
-        self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO)
+        self.set_________(position=NavigationItemPosition.BOTTOM)
+        self.setInterface('sets', '设置',       form=None,      icon=FIF.SETTING,
+                          position=NavigationItemPosition.BOTTOM)
+        self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO,
+                          position=NavigationItemPosition.BOTTOM)
 
         self.initWindow()
+        self.hideReader()
 
     def initWindow(self):
         self.resize(900, 700)
@@ -59,31 +70,51 @@ class MainWin(FluentWindow):
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
 
+    def hideReader(self):
+        # 在初始化时隐藏阅读器
+        self.interface['read']['navigater'].hide()
+
     def setInterface(self, name: str, text: str, /, *, form: Widget = None, 
                      icon: QIcon = QIcon(), parent=None, position=NavigationItemPosition.TOP):
+        # 设置导航栏的按钮
         widget = Widget(name, self, form)
         self.interface[name] = {
-            'widget': widget,
-            'interface': self.addSubInterface(widget, icon, text, parent=parent, position=position)
+            'interface': widget,   # 界面
+            'navigater': self.addSubInterface(widget, icon, text, parent=parent, position=position) # 导航栏
         }
 
-    def setSeparator(self, name:str, position: NavigationItemPosition = NavigationItemPosition.TOP):
-        self.interface[name] = {
-            'widget': None,
-            'interface': self.navigationInterface.addSeparator(position=position)
-        }
+    def set_________(self, position: NavigationItemPosition = NavigationItemPosition.TOP):
+        # 设置导航栏的分隔符
+        self.navigationInterface.addSeparator(position=position)
 
     def openFile(self, file_path):
         # 打开文件的逻辑
-        print("open file: ", file_path)
+        print('打开文件:', file_path)
+        with open(file_path, 'rb') as file:
+            try:
+                req_upload = requests.post(
+                    url='http://47.121.28.18:8000/api/upload',
+                    files={'file': file}
+                )
+            except:
+                utils.alert('文件打开失败', '文件打开失败，请检查文件路径或网络连接。', self, only=True)
+                return
+        token = req_upload.json().get('token')
+        if token in self.reading.keys():
+            # 如果文件已经在阅读中，则直接打开
+            self.interface[token]['navigater'].click()
+            return
+        # 如果文件不在阅读中，则创建页面，开始阅读
+        self.setInterface(token, os.path.basename(file_path), form=Form_Read, 
+                          parent=self.interface['read']['interface'])
+        self.interface[token]['interface'].read(token)
 
 
 if __name__ == "__main__":
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     app = QApplication(sys.argv)
-    #初始化
     win = MainWin()
-    #将窗口控件显示在屏幕上
     win.show()
-    #程序运行，sys.exit方法确保程序完整退出。
+    win.setCustomBackgroundColor(QColor(242, 242, 242), QColor(25, 33, 42))
+    win.setMicaEffectEnabled(False)
     sys.exit(app.exec_())
