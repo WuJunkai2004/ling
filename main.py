@@ -1,6 +1,7 @@
 import sys
 import requests
 import os
+import time
 
 from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel, setFont
 from qfluentwidgets import FluentIcon as FIF
@@ -32,8 +33,8 @@ class Widget(QFrame):
             self.label.setAlignment(Qt.AlignCenter)
             self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
         else:
-            ui = Frame()
-            ui.setupUi(self)
+            self.ui = Frame()
+            self.ui.setupUi(self)
         # 必须给子界面设置全局唯一的对象名
         self.setObjectName(text.replace(' ', '-'))
 
@@ -49,9 +50,9 @@ class MainWin(FluentWindow):
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
         self.setInterface('open', '打开文件',   form=Form_Open, icon=FIF.VIEW)
-        self.setInterface('hist', '阅读历史',   form=Form_Read, icon=FIF.HISTORY)
+        self.setInterface('hist', '阅读历史',   form=None, icon=FIF.HISTORY)
         self.set_________()
-        self.setInterface('read', '正在阅读',   form=None,      icon=FIF.EDIT)
+        self.setInterface('read', '正在阅读',   form=Form_Read, icon=FIF.EDIT)
         self.set_________()
         self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
         self.set_________(position=NavigationItemPosition.BOTTOM)
@@ -61,18 +62,13 @@ class MainWin(FluentWindow):
                           position=NavigationItemPosition.BOTTOM)
 
         self.initWindow()
-        self.hideReader()
 
     def initWindow(self):
-        self.resize(900, 700)
+        self.resize(1080, 700)
         self.setWindowIcon(QIcon('./assets/icon.ico'))
         self.setWindowTitle('灵犀摘')
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
-
-    def hideReader(self):
-        # 在初始化时隐藏阅读器
-        self.interface['read']['navigater'].hide()
 
     def setInterface(self, name: str, text: str, /, *, form: Widget = None, 
                      icon: QIcon = QIcon(), parent=None, position=NavigationItemPosition.TOP):
@@ -100,14 +96,22 @@ class MainWin(FluentWindow):
                 utils.alert('文件打开失败', '文件打开失败，请检查文件路径或网络连接。', self, only=True)
                 return
         token = req_upload.json().get('token')
+        try:
+            req_convert = requests.post(
+                url='http://47.121.28.18:8000/api/convert',
+                json={'token': token}
+            )
+        except:
+            utils.alert('文件打开失败', '文件打开失败，阅读器可能不支持该文件格式。', self, only=True)
+            return
         if token in self.reading.keys():
             # 如果文件已经在阅读中，则直接打开
             self.interface[token]['navigater'].click()
             return
         # 如果文件不在阅读中，则创建页面，开始阅读
-        self.setInterface(token, os.path.basename(file_path), form=Form_Read, 
-                          parent=self.interface['read']['interface'])
-        self.interface[token]['interface'].read(token)
+        self.interface["read"]['interface'].ui.widget.read(token)
+        time.sleep(3)
+        self.interface["read"]['navigater'].click()
 
 
 if __name__ == "__main__":
