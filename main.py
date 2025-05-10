@@ -37,15 +37,6 @@ class MainWin(FluentWindow):
         super().__init__()
         self.navigationInterface.setExpandWidth(250)
 
-<<<<<<< HEAD
-        self.homeInterface = Widget('Home Interface', self, Form_Home)
-        self.openInterface = Widget('Open Interface', self, Form_Open)
-        self.histInterface = Widget('History Interface', self)
-        self.markInterface = Widget('mark Interface', self)
-        self.albumInterface1 = Widget('Album Interface 1', self)
-        self.setsInterface = Widget('Setting Interface', self)
-        self.infoInterface = Widget('Info Interface', self, Form_Info)
-=======
         self.interface = {}
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
@@ -58,32 +49,15 @@ class MainWin(FluentWindow):
         self.setSeparator('bottom-separator')
         self.setInterface('sets', '设置',       form=None,      icon=FIF.SETTING)
         self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO)
->>>>>>> d9baeac853e8fcf7835046ab42ce9693a5c6d4ed
 
         self.initWindow()
 
-<<<<<<< HEAD
-    def initNavigation(self):
-        self.addSubInterface(self.homeInterface, FIF.HOME,      '首页')
-        self.addSubInterface(self.openInterface, FIF.VIEW,      '打开文件')
-        self.addSubInterface(self.histInterface, FIF.HISTORY,   '阅读历史')
-        self.navigationInterface.addSeparator()
-        self.addSubInterface(self.markInterface, FIF.BOOK_SHELF,'收藏', NavigationItemPosition.SCROLL)
-        self.addSubInterface(self.albumInterface1,  FIF.BOOK_SHELF, 'Album 1',  parent=self.markInterface)
-        self.navigationInterface.addSeparator(NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.setsInterface, FIF.SETTING,   '设置', NavigationItemPosition.BOTTOM)
-        self.addSubInterface(self.infoInterface, FIF.INFO,      '关于', NavigationItemPosition.BOTTOM)
-
-=======
->>>>>>> d9baeac853e8fcf7835046ab42ce9693a5c6d4ed
     def initWindow(self):
         self.resize(900, 700)
         self.setWindowIcon(QIcon('./assets/icon.ico'))
         self.setWindowTitle('灵犀摘')
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
-<<<<<<< HEAD
-=======
 
     def setInterface(self, name: str, text: str, /, *, form: Widget = None, 
                      icon: QIcon = QIcon(), parent=None, position=NavigationItemPosition.TOP):
@@ -102,7 +76,6 @@ class MainWin(FluentWindow):
     def openFile(self, file_path):
         # 打开文件的逻辑
         print("open file: ", file_path)
->>>>>>> d9baeac853e8fcf7835046ab42ce9693a5c6d4ed
 
 
 if __name__ == "__main__":
