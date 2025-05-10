@@ -13,9 +13,50 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="reader" name="widget" native="true"/>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="chatIcon" name="chatIcon">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="main">
+     <item>
+      <widget class="reader" name="widget" native="true"/>
+     </item>
+     <item>
+      <widget class="QWidget" name="right_edge" native="true">
+       <property name="maximumSize">
+        <size>
+         <width>0</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: red;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -26,10 +67,35 @@
    <header>units.read</header>
    <container>1</container>
    <slots>
-    <slot>openUrl()</slot>
+    <slot>start_chat()</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>chatIcon</class>
+   <extends>QToolButton</extends>
+   <header>units.read</header>
+   <slots>
+    <slot>start_chat()</slot>
    </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>chatIcon</sender>
+   <signal>clicked()</signal>
+   <receiver>widget</receiver>
+   <slot>start_chat()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>782</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>725</x>
+     <y>375</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

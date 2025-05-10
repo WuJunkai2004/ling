@@ -1,104 +1,35 @@
-# import QUrl
 from PyQt5.QtCore import QUrl
-from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView # Added QWebEngineView for type hint
-from PyQt5.QtCore import pyqtSignal # Added pyqtSignal for custom signal
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QSplitter, QTextEdit, QPushButton, QVBoxLayout, QLabel, QApplication # Added imports
+from PyQt5.QtWidgets import QVBoxLayout, QApplication # Added imports
 import requests # Added for API calls
 import json # Added for JSON handling
 
 from qframelesswindow.webengine import FramelessWebEngineView
-from qframelesswindow import FramelessWindow # reader will be a QWidget now
+from qfluentwidgets import FluentIcon as FIF
 
-class CustomWebEnginePage(QWebEnginePage):
-    linkClicked = pyqtSignal(QUrl)
 
+from qfluentwidgets import FlyoutViewBase, Flyout, FlyoutAnimationType, PlainTextEdit, TextEdit, PushButton
+class ChatBar(FlyoutViewBase):
     def __init__(self, parent=None):
         super().__init__(parent)
-
-    def acceptNavigationRequest(self, url, type, isMainFrame):
-        if type == QWebEnginePage.NavigationTypeLinkClicked:
-            self.linkClicked.emit(url)
-            return False # Prevent default navigation for clicked links
-        return super().acceptNavigationRequest(url, type, isMainFrame)
-
-class reader(QWidget): # Changed base class to QWidget
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.chat_history = [] # Initialize chat history
-        self.current_url = ""
-
-        # Main layout
-        self.layout = QHBoxLayout(self)
-        self.setLayout(self.layout)
-
-        # Splitter for left (PDF) and right (Chat)
-        self.splitter = QSplitter(self)
-        self.layout.addWidget(self.splitter)
-
-        # PDF阅读器
-        # Left side: PDF Viewer
-        self.pdf_viewer = FramelessWebEngineView(self)
-        # Create and set the custom page
-        self.custom_page = CustomWebEnginePage(self.pdf_viewer)
-        self.pdf_viewer.setPage(self.custom_page)
-        self.pdf_viewer.page().setDevToolsPage(self.pdf_viewer.page()) # Configure dev tools for pdf_viewer
-        # self.pdf_viewer.resizeEvent = self.onResizeEvent # This might not be needed or handled differently
-        self.splitter.addWidget(self.pdf_viewer)
-
-        # LLM交流器
-        # Right side: Chat Interface (Placeholder)
-        self.chat_widget = QWidget(self)
-        self.chat_layout = QVBoxLayout(self.chat_widget)
-        self.chat_widget.setLayout(self.chat_layout)
-
-        self.chat_display = QTextEdit(self.chat_widget)
+        self.chat_layout = QVBoxLayout(self)
+    
+        self.chat_display = PlainTextEdit(self)
         self.chat_display.setReadOnly(True)
         self.chat_layout.addWidget(self.chat_display)
 
-        self.chat_input = QTextEdit(self.chat_widget)
+        self.chat_input = TextEdit(self)
         self.chat_input.setFixedHeight(50) # Set a fixed height for input
+        self.chat_input.setPlaceholderText("请输入消息...")
         self.chat_layout.addWidget(self.chat_input)
 
-        self.send_button = QPushButton("发送", self.chat_widget)
+        self.send_button = PushButton("发送", self)
+        self.send_button.clicked.connect(self.send_message)
         self.chat_layout.addWidget(self.send_button)
-        self.send_button.clicked.connect(self.send_message) # Connect send message logic
+        
+        self.chat_layout.setContentsMargins(10, 10, 10, 10)
+        self.chat_layout.setSpacing(10)
+        self.setFixedSize(200, 600)
 
-        self.splitter.addWidget(self.chat_widget)
-
-        # Set initial sizes for splitter panes (optional)
-        self.splitter.setSizes([self.width() // 2, self.width() // 2])
-
-        # Connect signals for PDF viewer if needed
-        self.custom_page.linkClicked.connect(self.onLinkClicked)
-        # self.resizeEvent = self.onResizeEvent # Override resize event for the main reader widget if needed
-
-    def read(self, token:str):
-        print("openUrl in read.reader")
-        print(f"http://47.121.28.18:8000/var/html/{token}.html")
-        url = QUrl(f"http://47.121.28.18:8000/var/html/{token}.html")
-        self.current_url = url.toString() # Store the current URL
-        self.pdf_viewer.setUrl(url)
-        self.pdf_viewer.load(url)
-        self.pdf_viewer.show()
-        self.show() # Show the main reader widget
-        print("openUrl in read.reader end")
-
-    def onLinkClicked(self, url):
-        print(f"用户点击了链接: {url.toString()}")
-
-    def getSelectedText(self):
-        self.pdf_viewer.page().runJavaScript("window.getSelection().toString();", self.onTextSelected)
-
-    def onTextSelected(self, text):
-        print(f"用户选择的文字: {text}")
-
-    # def onResizeEvent(self, event): # This might need to be re-evaluated or removed if layout handles it
-    #     new_width = self.width()
-    #     new_height = self.height()
-    #     print(f"窗口大小已更改: 宽度={new_width}, 高度={new_height}")
-    #     super().resizeEvent(event)
-
-    # Placeholder for send message logic
     def send_message(self):
         user_text = self.chat_input.toPlainText().strip()
         if not user_text:
@@ -189,10 +120,41 @@ class reader(QWidget): # Changed base class to QWidget
                 cursor.deletePreviousChar() # Remove the newline if any
             self.chat_display.append(f"LLM Error: 未知错误 - {e}")
 
-    # def send_message(self):
-    #     user_text = self.chat_input.toPlainText()
-    #     if user_text.strip():
-    #         self.chat_display.append(f"用户: {user_text}")
-    #         # Add LLM interaction logic here
-    #         self.chat_display.append(f"LLM: ... (响应) ...") 
-    #         self.chat_input.clear()
+
+from PyQt5 import QtWidgets
+class reader(FramelessWebEngineView): # Changed base class to QWidget
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.chat = None
+
+    def read(self, token:str):
+        print("openUrl in read.reader")
+        print(f"http://47.121.28.18:8000/var/html/{token}.html")
+        url = QUrl(f"http://47.121.28.18:8000/var/html/{token}.html")
+        self.setUrl(url)
+        self.load(url)
+        self.show()
+        print("openUrl in read.reader end")
+
+    def onLinkClicked(self, url):
+        print(f"用户点击了链接: {url.toString()}")
+
+    def getSelectedText(self):
+        self.pdf_viewer.page().runJavaScript("window.getSelection().toString();", self.onTextSelected)
+
+    def onTextSelected(self, text):
+        print(f"用户选择的文字: {text}")
+
+    def start_chat(self):
+        print("start_chat")
+        if self.chat is None:
+            self.chat = ChatBar(self)
+        Flyout.make(self.chat, self.parent().ui.right_edge, self, FlyoutAnimationType.SLIDE_LEFT, False)
+
+
+from qfluentwidgets import ToolButton
+class chatIcon(ToolButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setIcon(FIF.CHAT)
+        print("chatIcon")
