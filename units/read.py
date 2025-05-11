@@ -35,8 +35,8 @@ class ChatBar(FlyoutViewBase):
         user_text = self.chat_input.toPlainText().strip()
         if not user_text:
             return
-
-        self.chat_display.appendHtml(f"<b>用户:</b> {user_text.replace('\n', '<br>')}<br>")
+        user_text = user_text.replace("\n", "<br>") 
+        self.chat_display.appendHtml(f"<b>用户:</b> {user_text}<br>")
         self.chat_input.clear()
 
         MY_API_KEY = "sk-b278fb2336e74e5e99069e6c5845d877"
@@ -126,6 +126,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
     def __init__(self, parent=None):
         super().__init__(parent)
         self.chat = None
+        self.resizeEvent = self.onResizeEvent
 
     def read(self, token:str):
         print("openUrl in read.reader")
@@ -140,10 +141,16 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         print(f"用户点击了链接: {url.toString()}")
 
     def getSelectedText(self):
-        self.pdf_viewer.page().runJavaScript("window.getSelection().toString();", self.onTextSelected)
+        self.page().runJavaScript("window.getSelection().toString();", self.onTextSelected)
 
     def onTextSelected(self, text):
         print(f"用户选择的文字: {text}")
+
+    def onResizeEvent(self, event):
+        print("onResizeEvent")
+        if self.chat:
+            self.chat.setFixedSize(int(self.width()*0.25), int(self.height()*0.91) )
+        super().resizeEvent(event)
 
     def start_chat(self):
         print("start_chat")
