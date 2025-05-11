@@ -11,6 +11,7 @@ from qfluentwidgets import FlyoutViewBase, Flyout, FlyoutAnimationType, PlainTex
 class ChatBar(FlyoutViewBase):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.chat_history = []
         self.chat_layout = QVBoxLayout(self)
     
         self.chat_display = PlainTextEdit(self)
@@ -35,7 +36,7 @@ class ChatBar(FlyoutViewBase):
         if not user_text:
             return
 
-        self.chat_display.append(f"用户: {user_text}")
+        self.chat_display.appendHtml(f"<b>用户:</b> {user_text.replace('\n', '<br>')}<br>")
         self.chat_input.clear()
 
         MY_API_KEY = "sk-b278fb2336e74e5e99069e6c5845d877"
@@ -64,7 +65,7 @@ class ChatBar(FlyoutViewBase):
         }
 
         try:
-            self.chat_display.append("LLM: 正在思考中...")
+            self.chat_display.appendHtml("LLM: 正在思考中...")
             QApplication.processEvents() # Process UI events to show "正在思考中..."
 
             response = requests.post(api_url, headers=headers, json=payload, timeout=30) # Added timeout
@@ -109,7 +110,7 @@ class ChatBar(FlyoutViewBase):
             if cursor.selectedText().startswith("LLM: 正在思考中..."):
                 cursor.removeSelectedText()
                 cursor.deletePreviousChar() # Remove the newline if any
-            self.chat_display.append("LLM Error: 无法解析API响应")
+            self.chat_display.appendHtml("LLM Error: 无法解析API响应")
         except Exception as e:
             # Remove the "正在思考中..." message if it was the last one
             cursor = self.chat_display.textCursor()
@@ -118,10 +119,9 @@ class ChatBar(FlyoutViewBase):
             if cursor.selectedText().startswith("LLM: 正在思考中..."):
                 cursor.removeSelectedText()
                 cursor.deletePreviousChar() # Remove the newline if any
-            self.chat_display.append(f"LLM Error: 未知错误 - {e}")
+            self.chat_display.appendHtml(f"LLM Error: 未知错误 - {e}")
 
 
-from PyQt5 import QtWidgets
 class reader(FramelessWebEngineView): # Changed base class to QWidget
     def __init__(self, parent=None):
         super().__init__(parent)
