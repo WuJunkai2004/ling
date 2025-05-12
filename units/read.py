@@ -149,7 +149,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
     def onResizeEvent(self, event):
         print("onResizeEvent")
         if self.chat:
-            self.chat.setFixedSize(int(self.width()*0.25), int(self.height()*0.91) )
+            self.chat.setFixedSize(int(self.width()*0.25), int(self.height() - 20) )
         super().resizeEvent(event)
 
     def start_chat(self):

@@ -1,6 +1,7 @@
 import sys
 import time
 import requests
+import hashlib
 
 from PyQt5.QtCore    import Qt
 from PyQt5.QtGui     import QIcon, QColor, QFont
@@ -15,6 +16,17 @@ from views.open import Ui_Form as Form_Open
 from views.read import Ui_Form as Form_Read
 
 import units.utils as utils
+
+
+def md5(path: str) -> str:
+    """ 计算文件的md5值 """
+    m = hashlib.md5()
+    f = open(path, 'rb')
+    data = f.read(8 * 1024)
+    m.update(data)
+    f.close()
+    return m.hexdigest()
+
 
 class Widget(QFrame):
     def __init__(self, text: str, parent, Frame = None):
@@ -39,7 +51,6 @@ class MainWin(FluentWindow):
         self.navigationInterface.setExpandWidth(250)
 
         self.interface = {}
-        self.reading   = {}
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
         self.setInterface('open', '打开文件',   form=Form_Open, icon=FIF.VIEW)
@@ -79,6 +90,21 @@ class MainWin(FluentWindow):
     def openFile(self, file_path):
         # 打开文件的逻辑
         print('打开文件:', file_path)
+        md5_value = md5(file_path)
+        try:
+            req_md5 = requests.get(
+                url = 'http://47.121.28.18:8000/api/quicheck',
+                params = {'token': md5_value}
+            )
+        except:
+            pass
+        else:
+            if req_md5.json()['status']:
+                self.interface["read"]['interface'].ui.widget.read(md5_value)
+                time.sleep(3)
+                self.interface["read"]['navigater'].click()
+                return
+
         with open(file_path, 'rb') as file:
             try:
                 req_upload = requests.post(
@@ -96,10 +122,6 @@ class MainWin(FluentWindow):
             )
         except:
             utils.alert('文件打开失败', '文件打开失败，阅读器可能不支持该文件格式。', self, only=True)
-            return
-        if token in self.reading.keys():
-            # 如果文件已经在阅读中，则直接打开
-            self.interface[token]['navigater'].click()
             return
         # 如果文件不在阅读中，则创建页面，开始阅读
         self.interface["read"]['interface'].ui.widget.read(token)
