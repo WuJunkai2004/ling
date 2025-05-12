@@ -7,6 +7,8 @@ import io
 import json
 import os
 import sys
+import ast
+import inspect
 
 
 class ErrorStatu:
@@ -75,7 +77,7 @@ class URL(server.SimpleHTTPRequestHandler):
 
 
 
-class DATA(server.SimpleHTTPRequestHandler):
+class DATA(URL):
     '数据处理'
     def parse_form(self, data):
         '解析 application/x-www-form-urlencoded 数据'
@@ -163,7 +165,6 @@ class DATA(server.SimpleHTTPRequestHandler):
             # 如果没有找到 boundary，返回错误
             ErrorStatu(self, 400, 'Bad Request')
             return
-        print('boundary:', boundary)
 
         # 分割数据块并解析
         result = []
@@ -194,7 +195,7 @@ class DATA(server.SimpleHTTPRequestHandler):
                 return self.parse_data(data)
 
 
-class COOKIE(server.SimpleHTTPRequestHandler):
+class COOKIE(DATA):
 #============ cookie optional ============#
     def cookie_set(self, item, value):
         cookie = '{}={}aa=ss; Path=/'.format(item, value)
@@ -214,7 +215,7 @@ class COOKIE(server.SimpleHTTPRequestHandler):
 
 
 #============ response ============#
-class SEND(server.SimpleHTTPRequestHandler):
+class SEND(COOKIE):
     def send_file(self, path):
         self.end_headers()
         try:
@@ -251,7 +252,7 @@ class SEND(server.SimpleHTTPRequestHandler):
         self.send_response(code)
 
 
-class API(URL, DATA, COOKIE, SEND):
+class API(SEND):
     server_version = 'vercelHTTP/1.0'
     def do_GET(self):
         self.method = 'GET'
@@ -264,6 +265,9 @@ class API(URL, DATA, COOKIE, SEND):
     def do_HEAD(self):
         self.method = 'HEAD'
         self.vercel(self.translate_path(), self.translate_post(), self.headers)
+
+    def do_CONNECT(self):
+        pass
 
     def do_OPTIONS(self):
         pass
@@ -278,11 +282,58 @@ class API(URL, DATA, COOKIE, SEND):
         pass
 
 
+class macro(ast.NodeTransformer):
+    def visit_FunctionDef(self, node):
+        node.name = 'handler'
+        node.args.args = []
+        node.decorator_list = []
+        return node
+
+
 # 装饰器，将对应的函数内容变成 class handler(vercel.API) 的方法
 class register:
     def __init__(self, func):
-        self.vercel = func
+        self.globals = func.__globals__
+        self.macro(func)
 
+    def macro(self, func):
+        func = inspect.getsource(func)
+        func = ast.parse(func)
+        func = macro().visit(func)
+        func = ast.fix_missing_locations(func)
+        func = ast.unparse(func)
+        exec(func, self.globals)
+    
+    def vercel(self, response, url, data, headers):
+        cumsume_print = lambda *args, **keys : print(*args, **keys)
+        locals_var = {
+            'print': cumsume_print,
+            'response': response,
+            'url': url,
+            'data': data,
+            'headers': headers
+        }
+        exec(self.globals['handler'].__code__,
+             self.globals,
+             locals_var)
+
+
+def start(HandlerClass = API,
+          ServerClass  = server.ThreadingHTTPServer,
+          protocol = "HTTP/1.0", port = 8000, bind = None):
+    import socket
+    info = socket.getaddrinfo(bind, port, 
+                               type  = socket.SOCK_STREAM,
+                               flags = socket.AI_PASSIVE)[0]
+    ServerClass.address_family = info[0]
+    HandlerClass.protocol_version = protocol
+    with ServerClass(info[4], HandlerClass) as httpd:
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            sys.exit(0)
+
+ 
 
 '''HTTP/1.1协议中共定义了八种方法（有时也叫“动作”）来表明Request-URI指定的资源的不同操作方式：
 . OPTIONS - 返回服务器针对特定资源所支持的HTTP请求方法。
