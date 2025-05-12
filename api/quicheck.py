@@ -15,7 +15,7 @@ def handles(response: vercel.API, data):
         return
     md5 = data['token']
     db  = dblite.SQL('./var/datas.db')
-    idx = db['files']['md5'].find(md5)
+    idx = db['files']['md5'].index(md5)
     if idx == -1:
         response.send_code(200)
         response.send_json({
