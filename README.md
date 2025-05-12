@@ -30,7 +30,11 @@ verapi.py 是一个大量参考了vercel的api部署的python实现。调用 ver
 - 当请求的路径加上 '.py' 是一个python脚本时，服务器将路径视为一个api，执行该脚本，并返回执行结果。
 
 #### api的编写方法
-api首先是一个python脚本，里面必须有如下函数
+api首先是一个python脚本，里面必须有一个函数被注册为入口。  
+使用`@vercel.register`装饰器注册该函数为入口函数。  
+该函数的名称可以自定义，但必须是一个合法的python函数名称。  
+函数的四个参数(`response, url, data, headers`)都不是必须的。运行时会由环境自动传入。  
+但是依然建议在函数定义时添加这四个参数，以便于调试和测试。
 ```python
 import vercel
 
@@ -38,7 +42,7 @@ import vercel
 def handler(response, url, data, headers):
     pass
 ```
-一个python脚本有且仅有一个handler函数，函数的参数解释如下
+函数的参数解释如下
 - response: 请求的响应对象, 使用该对象返回响应
 - url: 请求的url, 指向请求的路径，api通常不理会该参数
 - data: 请求的body, 是一个json格式的字典，前端用request如何发送，后端就如何接收，无论是用post(json), post(form), get, get(param)何种方式发送，都能接收到同样的字典
@@ -61,7 +65,7 @@ def handler(response, url, data, headers):
 # 用text返回hello world
 import vercel
 @vercel.register
-def handler(response, url, data, headers):
+def text_handler(response):
     response.send_code(200)
     response.send_headers({
         'Content-Type': 'text/plain'
@@ -73,7 +77,7 @@ def handler(response, url, data, headers):
 # 返回一个文件
 import vercel
 @vercel.register
-def handler(response, url, data, headers):
+def file_handler(response):
     response.send_code(200)
     response.send_header('Content-Type','text/html')
     response.send_file('index.html')
@@ -83,7 +87,8 @@ def handler(response, url, data, headers):
 # 返回一个json
 import vercel
 @vercel.register
-def handler(response, url, data, headers):
+def json_handler(response, url):
+    print(url)
     response.send_code(200)
     response.send_header('Content-Type','application/json')
     response.send_json({
@@ -97,7 +102,7 @@ def handler(response, url, data, headers):
 import vercel
 
 @vercel.register
-def handler(response, url, data, headers):
+def error_handler(response):
     return vercel.ErrorStatu(response, 500)
 ```
 ErrorStatu是一个服务器错误提示类，可以直接进行一个快速的错误响应。
