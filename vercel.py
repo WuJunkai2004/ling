@@ -7,7 +7,6 @@ import io
 import json
 import os
 import sys
-import re
 
 
 class ErrorStatu:
@@ -216,7 +215,7 @@ class COOKIE(server.SimpleHTTPRequestHandler):
 
 #============ response ============#
 class SEND(server.SimpleHTTPRequestHandler):
-    def send_file(self,path):
+    def send_file(self, path):
         self.end_headers()
         try:
             f = open(path, 'rb')
@@ -224,8 +223,9 @@ class SEND(server.SimpleHTTPRequestHandler):
             raise IOError('404 Not Found')
         else:
             self.copyfile(f, self.wfile)
+            f.close()
 
-    def send_text(self,text):
+    def send_text(self, text):
         self.end_headers()
         enc = sys.getfilesystemencoding()
         encoded = text.encode(enc, 'surrogateescape')
@@ -233,8 +233,17 @@ class SEND(server.SimpleHTTPRequestHandler):
         f.write(encoded)
         f.seek(0)
         self.copyfile(f, self.wfile)
+        f.close()
 
-    def send_headers(self,headers):
+    def send_json(self, data: dict | list):
+        for header_str in self._headers_buffer:
+            if header_str.startswith('Content-Type:'):
+                self._headers_buffer.remove(header_str)
+                break
+        self.send_header('Content-Type', 'application/json')
+        self.send_text(json.dumps(data, ensure_ascii=False))
+
+    def send_headers(self, headers):
         for i in headers:
             self.send_header(i,headers[i])
     
@@ -270,12 +279,9 @@ class API(URL, DATA, COOKIE, SEND):
 
 
 # 装饰器，将对应的函数内容变成 class handler(vercel.API) 的方法
-def register(func):
-    '''注册函数'''
-    class handler(API):
-        def vercel(self, url, data, headers):
-            func(self, url, data, headers)
-    return handler
+class register:
+    def __init__(self, func):
+        self.vercel = func
 
 
 '''HTTP/1.1协议中共定义了八种方法（有时也叫“动作”）来表明Request-URI指定的资源的不同操作方式：

@@ -27,8 +27,7 @@ class handler(vercel.API):
     
         if(os.path.isfile(url)):
             if(os.path.splitext(url)[1]=='.py'):
-                vercel.ErrorStatu(self, 403)
-                return
+                return vercel.ErrorStatu(self, 403)
             self.send_code(200)
             self.send_file(url)
             return
