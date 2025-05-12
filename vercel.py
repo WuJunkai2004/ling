@@ -238,7 +238,7 @@ class SEND(COOKIE):
 
     def send_json(self, data: dict | list):
         for header_str in self._headers_buffer:
-            if header_str.startswith('Content-Type:'):
+            if header_str.startswith(b'Content-Type:'):
                 self._headers_buffer.remove(header_str)
                 break
         self.send_header('Content-Type', 'application/json')
@@ -284,15 +284,17 @@ class API(SEND):
 
 class macro(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
-        node.name = 'handler'
+        node.name = 'main'
         node.args.args = []
+        # 原先是vercel.register装饰器
+        # 改为  vercel.handler装饰器
         node.decorator_list = []
         return node
 
-
-# 装饰器，将对应的函数内容变成 class handler(vercel.API) 的方法
 class register:
     def __init__(self, func):
+        print('register', func.__name__)
+        self.funname = func.__name__
         self.globals = func.__globals__
         self.macro(func)
 
@@ -303,19 +305,16 @@ class register:
         func = ast.fix_missing_locations(func)
         func = ast.unparse(func)
         exec(func, self.globals)
+        self.globals['handler'] = self
     
     def vercel(self, response, url, data, headers):
         cumsume_print = lambda *args, **keys : print(*args, **keys)
-        locals_var = {
-            'print': cumsume_print,
-            'response': response,
-            'url': url,
-            'data': data,
-            'headers': headers
-        }
-        exec(self.globals['handler'].__code__,
-             self.globals,
-             locals_var)
+        self.globals['print'] = cumsume_print
+        self.globals['response'] = response
+        self.globals['url'] = url
+        self.globals['data'] = data
+        self.globals['headers'] = headers
+        exec(self.globals['main'].__code__, self.globals)
 
 
 def start(HandlerClass = API,
