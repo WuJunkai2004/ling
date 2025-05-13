@@ -52,6 +52,10 @@ class CONLUMN:
         for item in self.cursor.fetchall().__iter__():
             yield item[0]
 
+    def __len__(self):
+        self.cursor.execute("SELECT COUNT({}) FROM {}".format(self.name, self.table))
+        return self.cursor.fetchone()[0]
+
 
 class TABLE:
     def __init__(self, cursor, table) -> None:
@@ -78,6 +82,14 @@ class TABLE:
 
     def del_table(self):
         self.cursor.execute("DROP TABLE {}".format(self.name))
+
+    def existed(self):
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='{}'".format(self.name))
+        return bool(self.cursor.fetchone())
+    
+    def __len__(self):
+        self.cursor.execute("SELECT COUNT(*) FROM {}".format(self.name))
+        return self.cursor.fetchone()[0]
 
 
 

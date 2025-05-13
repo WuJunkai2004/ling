@@ -286,17 +286,15 @@ class macro(ast.NodeTransformer):
     def visit_FunctionDef(self, node):
         node.name = 'main'
         node.args.args = []
-        # 原先是vercel.register装饰器
-        # 改为  vercel.handler装饰器
         node.decorator_list = []
         return node
 
 class register:
     def __init__(self, func):
-        print('register', func.__name__)
         self.funname = func.__name__
         self.globals = func.__globals__
         self.macro(func)
+        self.globals['handler'] = self
 
     def macro(self, func):
         func = inspect.getsource(func)
@@ -305,7 +303,6 @@ class register:
         func = ast.fix_missing_locations(func)
         func = ast.unparse(func)
         exec(func, self.globals)
-        self.globals['handler'] = self
     
     def vercel(self, response, url, data, headers):
         cumsume_print = lambda *args, **keys : print(*args, **keys)

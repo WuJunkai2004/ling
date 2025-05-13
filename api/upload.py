@@ -19,15 +19,15 @@ def get_md5(file_content: io.BytesIO) -> str:
 
 
 @vercel.register
-def handler(self: vercel.API, url, data, headers):
+def handler(response: vercel.API, url, data, headers):
     """
     Handles the POST request to upload a PDF file.
     """
     # Check if the request method is POST
-    if self.method != 'POST':
-        return vercel.ErrorStatu(self, 405)
+    if response.method != 'POST':
+        return vercel.ErrorStatu(response, 405)
     if len(data) != 1:
-        return vercel.ErrorStatu(self, 400)
+        return vercel.ErrorStatu(response, 400)
 
     file = data[0]
     md5  = get_md5(file['Content'])
@@ -38,7 +38,7 @@ def handler(self: vercel.API, url, data, headers):
         # 拼接对应的后缀名
         path = os.path.join('./var/files', md5 + os.path.splitext(file['filename'])[1])
         with open(path, 'wb') as f:
-            self.copyfile(file['Content'], f)
+            response.copyfile(file['Content'], f)
         # 记录文件信息
         db['files'].insert(file['filename'],
                         md5 + os.path.splitext(file['filename'])[1],
@@ -48,12 +48,12 @@ def handler(self: vercel.API, url, data, headers):
     else:
         file_info = db['files']['filename'][find]
 
-    self.send_code(200)
-    self.send_headers({
+    response.send_code(200)
+    response.send_headers({
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
     })
-    self.send_text(json.dumps({
+    response.send_text(json.dumps({
         'filename': file_info,
         'md5': md5,
         'token': md5,
