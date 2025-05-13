@@ -3,7 +3,7 @@ import time
 import requests
 import hashlib
 
-from PyQt5.QtCore    import Qt
+from PyQt5.QtCore    import Qt, QMetaObject, Q_ARG, pyqtSlot
 from PyQt5.QtGui     import QIcon, QColor, QFont
 from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
 
@@ -87,46 +87,72 @@ class MainWin(FluentWindow):
         # 设置导航栏的分隔符
         self.navigationInterface.addSeparator(position=position)
 
+    def switchReader(self, token: str):
+        # 切换到阅读器界面
+        if token == 'didnt upload':
+            return 'continue'
+        print('文件打开中...')
+        # 切换到主线程
+        QMetaObject.invokeMethod(self.interface["read"]['interface'].ui.widget, "read", Qt.QueuedConnection, 
+                                  Q_ARG(str, token))
+        time.sleep(3)
+        # 切换到阅读器界面
+        #QMetaObject.invokeMethod(self.interface["read"]['navigater'], "click", Qt.QueuedConnection)
+        self.interface['read']['navigater'].click()
+        print('文件打开成功')
+        return 'stop'
+    
+    def failOpen(self, e):
+        # 打开文件失败的回调函数
+        print('文件打开失败', e)
+        QMetaObject.invokeMethod(self, "alertOpen", Qt.QueuedConnection)
+        
+    @pyqtSlot()
+    def alertOpen(self):
+        # 弹出提示框
+        utils.alert('文件打开失败', '文件打开失败，阅读器可能不支持该文件格式。', self, only=True)
+
     def openFile(self, file_path):
         # 打开文件的逻辑
-        print('打开文件:', file_path)
-        md5_value = md5(file_path)
-        try:
+        def file_check_md5():
+            print('文件检查中...')
+            md5_value = md5(file_path)
             req_md5 = requests.get(
                 url = 'http://47.121.28.18:8000/api/quicheck',
                 params = {'token': md5_value}
             )
-        except:
-            pass
-        else:
             if req_md5.json()['status']:
-                self.interface["read"]['interface'].ui.widget.read(md5_value)
-                time.sleep(3)
-                self.interface["read"]['navigater'].click()
-                return
-
-        with open(file_path, 'rb') as file:
-            try:
+                return md5_value
+            return 'didnt upload'
+        
+        def file_upload(md5_value):
+            if(md5_value == 'stop'):
+                return 'stop'
+            print('文件上传中...')
+            with open(file_path, 'rb') as file:
                 req_upload = requests.post(
                     url='http://47.121.28.18:8000/api/upload',
                     files={'file': file}
                 )
-            except:
-                utils.alert('文件打开失败', '文件打开失败，请检查文件路径或网络连接。', self, only=True)
-                return
-        token = req_upload.json().get('token')
-        try:
-            req_convert = requests.post(
+            return req_upload.json().get('token')
+
+        def file_convert(md5_value):
+            if(md5_value == 'stop'):
+                return 'didnt upload'
+            print('文件转换中...')
+            requests.post(
                 url='http://47.121.28.18:8000/api/convert',
-                json={'token': token}
+                json={'token': md5_value}
             )
-        except:
-            utils.alert('文件打开失败', '文件打开失败，阅读器可能不支持该文件格式。', self, only=True)
-            return
-        # 如果文件不在阅读中，则创建页面，开始阅读
-        self.interface["read"]['interface'].ui.widget.read(token)
-        time.sleep(3)
-        self.interface["read"]['navigater'].click()
+            return md5_value
+
+        utils.promise(self, file_check_md5) \
+             .then(self.switchReader) \
+             .then(file_upload) \
+             .then(file_convert) \
+             .then(self.switchReader) \
+             .catch(self.failOpen) \
+             .start()
 
 
 if __name__ == "__main__":

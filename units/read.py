@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, pyqtSlot
 from PyQt5.QtWidgets import QVBoxLayout, QApplication # Added imports
 import requests # Added for API calls
 import json # Added for JSON handling
@@ -128,11 +128,14 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         self.chat = None
         self.resizeEvent = self.onResizeEvent
 
+    @pyqtSlot(str)
     def read(self, token:str):
         print("openUrl in read.reader")
         print(f"http://47.121.28.18:8000/var/html/{token}.html")
         url = QUrl(f"http://47.121.28.18:8000/var/html/{token}.html")
+        print(f"openUrl in read.reader url: {url}")
         self.setUrl(url)
+        print(f"setUrl: {url}\nloading...")
         self.load(url)
         self.show()
         print("openUrl in read.reader end")
