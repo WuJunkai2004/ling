@@ -35,7 +35,7 @@ def quest(question, token):
     content = []
     content.append({
         "role": "system",
-        "content": "You are a helpful assistant."
+        "content": "You are a helpful assistant. Please always respond in Chinese (简体中文)."
     })
     content.extend(load_history(token))
     content.append({

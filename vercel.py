@@ -9,6 +9,8 @@ import os
 import sys
 import ast
 import inspect
+import logging
+
 
 
 class ErrorStatu:
@@ -46,6 +48,46 @@ class ErrorStatu:
 
 
 
+class ServerLog:
+    def __init__(self, name = 'server'):
+        self.log = logging.getLogger(name)
+        self.log.setLevel(logging.DEBUG)
+
+        self.formatter = logging.Formatter('%(asctime)s | %(levelname)-7s | %(name)-10s | %(message)s', datefmt='%H:%M:%S')
+
+        self.file_handler = logging.FileHandler('server.log')
+        self.file_handler.setFormatter(self.formatter)
+        self.log.addHandler(self.file_handler)
+
+        self.cons_handler = logging.StreamHandler(sys.stdout)
+        self.cons_handler.setFormatter(self.formatter)
+        self.log.addHandler(self.cons_handler)
+
+        self.log.addFilter(self.center)
+
+    def name(self, name):
+        '设置日志名称'
+        self.log.name = name
+        return self
+    
+    def center(self, record):
+        '将levelname和name居中'
+        record.levelname = f"{record.levelname:^7}"
+        record.name = f"{record.name:^10}"
+        return True
+
+    def __call__(self, *values, sep = ' ', end = '\n', file = None, flush = False, level = logging.INFO):
+        if(type(values) == tuple):
+            values = sep.join(map(str, values))
+        if(type(values) == str):
+            values = values.encode('utf-8')
+        if(type(values) == bytes):
+            values = values.decode('utf-8')
+        self.log.log(level, values)
+verlog = ServerLog()
+
+
+
 class URL(server.SimpleHTTPRequestHandler):
     'URL处理'
     def translate_path(self):
@@ -74,6 +116,10 @@ class URL(server.SimpleHTTPRequestHandler):
             else:
                 args[word[0]] = word[1]
         return args
+    
+    def log_message(self, format, *args):
+        message = format % args
+        verlog.name('server')(message)
 
 
 
@@ -305,8 +351,7 @@ class register:
         exec(func, self.globals)
     
     def vercel(self, response, url, data, headers):
-        cumsume_print = lambda *args, **keys : print(*args, **keys)
-        self.globals['print'] = cumsume_print
+        self.globals['print'] = verlog.name(self.funname)
         self.globals['response'] = response
         self.globals['url'] = url
         self.globals['data'] = data
