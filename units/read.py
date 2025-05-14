@@ -53,11 +53,11 @@ class ChatBar(FlyoutViewBase):
         try:
             res = requests.post("http://47.121.28.18:8000/api/chat/chat", json=payload).json()
         except:
-            utils.alert("请求失败", "请检查网络连接或API服务。")
+            utils.alert("请求失败", "请检查网络连接或API服务。",self)
             return
         
         if res['success'] == False:
-            utils.alert("云端错误", res['msg'])
+            utils.alert("云端错误", res['msg'],self)
             return
         
         self.chat_display.appendHtml(f"<b>LLM:</b> {res['answer']}<br>")
