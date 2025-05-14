@@ -66,10 +66,13 @@ class TABLE:
         return CONLUMN(self.cursor, self.name, __name)
 
     def create(self, *__conlumns):
-        self.cursor.execute( 'CREATE TABLE {}\n({});'.format(self.name, ',\n'.join(['"{}" TEXT'.format(item) for item in __conlumns]) ) )
+        self.cursor.execute( 'CREATE TABLE "{}"\n({});'.format(self.name, ',\n'.join(['"{}" TEXT'.format(item) for item in __conlumns]) ) )
 
     def insert(self, *__value) -> None:
-        self.cursor.execute("INSERT INTO {} VALUES({})".format(self.name, ",".join(['"{}"'.format(item) for item in __value]) ) )
+        try:
+            self.cursor.execute("INSERT INTO {} VALUES({})".format(self.name, ",".join(['"{}"'.format(item) for item in __value]) ) )
+        except:
+            return 'ERROR in ```{}```'.format(__value)
 
     def filder(self, __filder):
         pass

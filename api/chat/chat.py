@@ -10,17 +10,15 @@ def load_history(token):
         db[token].commit()
     lens = len(db[token])
     result = []
-    for i in range(max(lens - 5, 1), lens + 1):
+
+    for i in range(max(lens - 20, 1), lens + 1):
         question = db[token]['question'][i]
-        answer   = db[token]['answer'][i]
         result.append({
             "role": "user",
             "content": question
         })
-        result.append({
-            "role": "assistant",
-            "content": answer
-        })
+    print(result)
+
     db.close()
     return result
 
@@ -42,9 +40,21 @@ def quest(question, token):
         "role": "user",
         "content": question
     })
+
+    # 创建一个新的消息数组
+    messages = []
+    messages.append({
+        "role": "system",
+        "content": f"这是用户的历史对话记录：{str(content)}"
+    })
+    messages.append({
+        "role": "user",
+        "content": f"根据以上历史记录，请回答问题：{question}"
+    })
+
     payload = {
         "model": "qwen-turbo",
-        "messages": content,
+        "messages": messages,
     }
     try:
         req = requests.post(api_url,
