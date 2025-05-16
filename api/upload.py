@@ -6,6 +6,8 @@ import dblite
 import vercel
 from langchain_community.document_loaders import PyMuPDFLoader
 import threading
+from langchain_community.embeddings import DashScopeEmbeddings
+from config import DASHSCOPE_API_KEY, EMBEDDING_MODEL
 
 def get_md5(file_content: io.BytesIO) -> str:
     """
@@ -36,10 +38,11 @@ def process_pdf_to_vector(pdf_path):
             pattern = re.compile(r'[^\u4e00-\u9fff](\n)[^\u4e00-\u9fff]', re.DOTALL)
             pdf_page.page_content = re.sub(pattern, lambda match: match.group(0).replace('\n', ''), pdf_page.page_content)
 
-        from langchain_community.embeddings import DashScopeEmbeddings
+
+
         embedding = DashScopeEmbeddings(
-            model="text-embedding-v1",
-            dashscope_api_key="sk-b278fb2336e74e5e99069e6c5845d877"
+            model=EMBEDDING_MODEL,
+            dashscope_api_key=DASHSCOPE_API_KEY
         )
 
         text_splitter = RecursiveCharacterTextSplitter(

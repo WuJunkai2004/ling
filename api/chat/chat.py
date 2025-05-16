@@ -3,13 +3,17 @@ import requests
 import dblite
 from langchain_chroma import Chroma
 from langchain_community.embeddings import DashScopeEmbeddings
-
-
+from config import (
+    DASHSCOPE_API_KEY,
+    DASHSCOPE_API_URL,
+    EMBEDDING_MODEL,
+    CHAT_MODEL
+)
 
 # 初始化 embedding 模型
 embedding = DashScopeEmbeddings(
-    model="text-embedding-v1",
-    dashscope_api_key="sk-b278fb2336e74e5e99069e6c5845d877"
+    model=EMBEDDING_MODEL,
+    dashscope_api_key=DASHSCOPE_API_KEY
 )
 
 # 加载持久化的向量数据库
@@ -39,10 +43,8 @@ def load_history(token):
 
 
 def quest(question, token):
-    api_key = "sk-b278fb2336e74e5e99069e6c5845d877"
-    api_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {api_key}",
+        "Authorization": f"Bearer {DASHSCOPE_API_KEY}",
         "Content-Type": "application/json"
     }
     content = []
@@ -75,14 +77,14 @@ def quest(question, token):
     })
     
     payload = {
-        "model": "qwen-turbo",
+        "model": CHAT_MODEL,
         "messages": messages,
     }
     try:
-        req = requests.post(api_url,
-                            headers = headers,
-                            json    = payload,
-                            timeout = 10)
+        req = requests.post(DASHSCOPE_API_URL,
+                            headers=headers,
+                            json=payload,
+                            timeout=10)
         req = req.json()
     except:
         return {
