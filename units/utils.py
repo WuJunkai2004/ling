@@ -90,12 +90,14 @@ class setting:
     
     def __call__(self, value):
         with open('./config.json', 'r', encoding='utf-8') as f:
-            config = json.load(f)
+            origin = json.load(f)
+            config = origin
         for k in self.keys[:-1]:
             try:
                 config = config[k]
             except:
                 return None
         config[self.keys[-1]] = value
+        print(config)
         with open('./config.json', 'w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
+            json.dump(origin, f, ensure_ascii=False, indent=4)
