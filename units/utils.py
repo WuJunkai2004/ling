@@ -1,8 +1,9 @@
-from PyQt5.QtCore import Qt, QThread, pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
+import json
 
 def root(component):
     """获取组件的根组件, 用于回退到 winMain"""
-    while component.parent() is not None:
+    while hasattr(component, 'parent') and component.parent() is not None:
         component = component.parent()
     return component
 
@@ -69,3 +70,32 @@ class promise(QThread):
         pro .then_all(self.funs)\
             .catch(self.errf)\
             .start()
+        
+
+def cfg(*key: str):
+    with open('./config.json', 'r', encoding='utf-8') as f:
+        config = json.load(f)
+    for k in key:
+        try:
+            config = config[k]
+        except:
+            return None
+    return config
+
+
+class setting:
+    """setting("helper", "enabled")(True)"""
+    def __init__(self, *keys):
+        self.keys = keys
+    
+    def __call__(self, value):
+        with open('./config.json', 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        for k in self.keys[:-1]:
+            try:
+                config = config[k]
+            except:
+                return None
+        config[self.keys[-1]] = value
+        with open('./config.json', 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=4)

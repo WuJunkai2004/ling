@@ -1,7 +1,10 @@
+import hashlib
+import json
+import os
+
+import requests
 import sys
 import time
-import requests
-import hashlib
 
 from PyQt5.QtCore    import Qt, QMetaObject, Q_ARG, pyqtSlot
 from PyQt5.QtGui     import QIcon, QColor, QFont
@@ -14,6 +17,7 @@ from views.home import Ui_Form as Form_Home
 from views.info import Ui_Form as Form_Info
 from views.open import Ui_Form as Form_Open
 from views.read import Ui_Form as Form_Read
+from views.sets import Ui_Form as Form_Sets
 
 import units.utils as utils
 
@@ -60,12 +64,13 @@ class MainWin(FluentWindow):
         self.set_________()
         self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
         self.set_________(position=NavigationItemPosition.BOTTOM)
-        self.setInterface('sets', '设置',       form=None,      icon=FIF.SETTING,
+        self.setInterface('sets', '设置',       form=Form_Sets, icon=FIF.SETTING,
                           position=NavigationItemPosition.BOTTOM)
         self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO,
                           position=NavigationItemPosition.BOTTOM)
 
         self.initWindow()
+        self.initSetting()
 
     def initWindow(self):
         self.resize(1080, 700)
@@ -153,6 +158,18 @@ class MainWin(FluentWindow):
              .then(self.switchReader) \
              .catch(self.failOpen) \
              .start()
+    
+    def initSetting(self):
+        if os.path.exists('./config.json'):
+            return
+        default_setting = {
+            'helper': {
+                'enabled': True,
+                'display': 'float', # 浮动: float, 固定: fixed
+            }
+        }
+        with open('./config.json', 'w', encoding='utf-8') as f:
+            json.dump(default_setting, f, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":

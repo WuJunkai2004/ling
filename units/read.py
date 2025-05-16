@@ -53,11 +53,11 @@ class ChatBar(FlyoutViewBase):
         try:
             res = requests.post("http://47.121.28.18:8000/api/chat/chat", json=payload).json()
         except:
-            utils.alert("请求失败", "请检查网络连接或API服务。")
+            utils.alert("请求失败", "请检查网络连接或API服务。", utils.root(self))
             return
         
         if res['success'] == False:
-            utils.alert("云端错误", res['msg'])
+            utils.alert("云端错误", res['msg'], utils.root(self))
             return
         
         self.chat_display.appendHtml(f"<b>LLM:</b> {res['answer']}<br>")
@@ -78,6 +78,8 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         self.setUrl(url)
         self.load(url)
         self.show()
+        if self.token != token and self.chat is not None:
+            self.chat.chat_display.clear()
         self.token = token
         print("openUrl in read.reader end")
 
