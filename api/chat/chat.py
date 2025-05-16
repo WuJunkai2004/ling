@@ -22,6 +22,9 @@ vectordb = Chroma(
     embedding_function=embedding
 )
 
+# 构建检索器
+retriever = vectordb.as_retriever(search_kwargs={"k": 3})
+
 def load_history(token):
     db = dblite.SQL('./var/datas.db')
     if not db[token].existed():
@@ -69,7 +72,6 @@ def quest(question, token):
         "content": f"根据以上历史记录，请回答问题：{question}"
     })
 
-    retriever = vectordb.as_retriever(search_kwargs={"k": 3})
     docs = retriever.invoke(question)
     messages.append({
         "role": "system",
