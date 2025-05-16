@@ -60,8 +60,8 @@ class MainWin(FluentWindow):
     """ 主界面 """
     def __init__(self):
         super().__init__()
+        self.initSetting()
         self.navigationInterface.setExpandWidth(250)
-
         self.interface = {}
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
@@ -78,7 +78,6 @@ class MainWin(FluentWindow):
                           position=NavigationItemPosition.BOTTOM)
 
         self.initWindow()
-        self.initSetting()
 
     def initWindow(self):
         self.resize(1080, 700)

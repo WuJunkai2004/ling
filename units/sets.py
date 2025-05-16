@@ -7,4 +7,5 @@ class settingTitle(TitleLabel):
         if(utils.cfg("helper", "display") == num):
             return
         utils.setting("helper", "display")(num)
-        utils.alert("设置已保存", "设置已保存，请重启软件生效", utils.root(self), only=True)
+        if num == 0:
+            utils.alert("设置已保存", "设置已保存，请重启软件生效", utils.root(self), only=True)
