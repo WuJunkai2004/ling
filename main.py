@@ -164,8 +164,8 @@ class MainWin(FluentWindow):
             return
         default_setting = {
             'helper': {
-                'enabled': True,
-                'display': 'float', # 浮动: float, 固定: fixed
+                "require": ["float", "fixed"],
+                'display': 0, # 浮动: float, 固定: fixed
             }
         }
         with open('./config.json', 'w', encoding='utf-8') as f:

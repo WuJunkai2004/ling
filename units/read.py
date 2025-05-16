@@ -2,7 +2,7 @@ from PyQt5.QtCore import QUrl, pyqtSlot
 from PyQt5.QtWidgets import QVBoxLayout, QApplication # Added imports
 import requests # Added for API calls
 import json # Added for JSON handling
-import units.utils as utils # Added for utility functions
+from . import utils
 
 from qframelesswindow.webengine import FramelessWebEngineView
 from qfluentwidgets import FluentIcon as FIF
@@ -96,6 +96,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         print("onResizeEvent")
         if self.chat:
             self.chat.setFixedSize(int(self.width()*0.25), int(self.height() - 20) )
+            self.chat.chat_input.setFixedHeight(max(int(self.height()*0.2 - 20), 50))
         super().resizeEvent(event)
 
     def start_chat(self):
