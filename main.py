@@ -32,6 +32,14 @@ def md5(path: str) -> str:
     return m.hexdigest()
 
 
+class Page_Sets(Form_Sets):
+    def setupUi(self, Form):
+        super().setupUi(Form)
+        print('设置界面')
+        self.set_chatbar.setCurrentIndex(utils.cfg('helper', 'display'))
+    
+
+
 class Widget(QFrame):
     def __init__(self, text: str, parent, Frame = None):
         super().__init__(parent=parent)
@@ -64,7 +72,7 @@ class MainWin(FluentWindow):
         self.set_________()
         self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
         self.set_________(position=NavigationItemPosition.BOTTOM)
-        self.setInterface('sets', '设置',       form=Form_Sets, icon=FIF.SETTING,
+        self.setInterface('sets', '设置',       form=Page_Sets, icon=FIF.SETTING,
                           position=NavigationItemPosition.BOTTOM)
         self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO,
                           position=NavigationItemPosition.BOTTOM)

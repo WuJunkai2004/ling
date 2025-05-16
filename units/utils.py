@@ -97,6 +97,8 @@ class setting:
                 config = config[k]
             except:
                 return None
+        if config.get(self.keys[-1]) == value:
+            return
         config[self.keys[-1]] = value
         print(config)
         with open('./config.json', 'w', encoding='utf-8') as f:

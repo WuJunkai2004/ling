@@ -105,7 +105,17 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             self.token = "chat_test"
         if self.chat is None:
             self.chat = ChatBar(self, self.token)
-        Flyout.make(self.chat, self.parent().ui.right_edge, self, FlyoutAnimationType.SLIDE_LEFT, False)
+        if utils.cfg("helper", "display") == 0:
+            # 浮窗
+            Flyout.make(self.chat, self.parent().ui.right_edge, self, FlyoutAnimationType.SLIDE_LEFT, False)
+            return
+        # 侧边栏
+        if self.parent().ui.right_edge.width() > 0:
+            self.parent().ui.right_edge.setFixedWidth(0)
+            return
+        # the right_edge is a QWighet, so we need to set its size
+        self.parent().ui.right_edge.setLayout(self.chat.chat_layout)
+        self.parent().ui.right_edge.setFixedWidth(200)
 
 
 from qfluentwidgets import ToolButton

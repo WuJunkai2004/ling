@@ -80,7 +80,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="ComboBox" name="comboBox">
+          <widget class="ComboBox" name="set_chatbar">
            <property name="currentText">
             <string>浮动窗口</string>
            </property>
@@ -162,7 +162,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>comboBox</sender>
+   <sender>set_chatbar</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>label</receiver>
    <slot>changeChatbar(int)</slot>
