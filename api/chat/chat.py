@@ -1,7 +1,22 @@
 import vercel
 import requests
 import dblite
+from langchain_chroma import Chroma
+from langchain_community.embeddings import DashScopeEmbeddings
 
+
+
+# 初始化 embedding 模型
+embedding = DashScopeEmbeddings(
+    model="text-embedding-v1",
+    dashscope_api_key="sk-b278fb2336e74e5e99069e6c5845d877"
+)
+
+# 加载持久化的向量数据库
+vectordb = Chroma(
+    persist_directory='./var/vector_db',
+    embedding_function=embedding
+)
 
 def load_history(token):
     db = dblite.SQL('./var/datas.db')
@@ -52,6 +67,13 @@ def quest(question, token):
         "content": f"根据以上历史记录，请回答问题：{question}"
     })
 
+    retriever = vectordb.as_retriever(search_kwargs={"k": 3})
+    docs = retriever.invoke(question)
+    messages.append({
+        "role": "system",
+        "content": f"这是检索到的内容：{str(docs)}"
+    })
+    
     payload = {
         "model": "qwen-turbo",
         "messages": messages,
@@ -134,4 +156,5 @@ please answer the question:
         "answer": answer,
         "message": "Success"
     })
+
     
