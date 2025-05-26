@@ -6,8 +6,8 @@ import requests
 import sys
 import time
 
-from PyQt5.QtCore    import Qt, QMetaObject, Q_ARG, pyqtSlot
-from PyQt5.QtGui     import QIcon, QColor, QFont
+from PyQt5.QtCore    import Qt, pyqtSlot
+from PyQt5.QtGui     import QIcon, QFont
 from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
 
 from qfluentwidgets import FluentIcon as FIF
@@ -105,8 +105,7 @@ class MainWin(FluentWindow):
             return 'continue'
         print('文件打开中...')
         # 切换到主线程
-        QMetaObject.invokeMethod(self.interface["read"]['interface'].ui.widget, "read", Qt.QueuedConnection, 
-                                  Q_ARG(str, token))
+        utils.invokeMain(self.interface["read"]['interface'].ui.widget, "read", token)
         time.sleep(3)
         # 切换到阅读器界面
         #QMetaObject.invokeMethod(self.interface["read"]['navigater'], "click", Qt.QueuedConnection)
@@ -117,12 +116,13 @@ class MainWin(FluentWindow):
     def failOpen(self, e):
         # 打开文件失败的回调函数
         print('文件打开失败', e)
-        QMetaObject.invokeMethod(self, "alertOpen", Qt.QueuedConnection)
+        utils.invokeMain(self, "alertOpen")
         
     @pyqtSlot()
     def alertOpen(self):
         # 弹出提示框
         utils.alert('文件打开失败', '文件打开失败，阅读器可能不支持该文件格式。', self, only=True)
+        self.interface['open']['interface'].ui.inputs.stop_loader()
 
     def openFile(self, file_path):
         # 打开文件的逻辑
@@ -173,6 +173,10 @@ class MainWin(FluentWindow):
             'helper': {
                 "require": ["float", "fixed"],
                 'display': 0, # 浮动: float, 固定: fixed
+            },
+            "history": {
+                "require": ["remember", "forget"],
+                "display": 0, # 记住: remember, 忘记: forget
             }
         }
         with open('./config.json', 'w', encoding='utf-8') as f:
@@ -184,6 +188,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     win = MainWin()
     win.show()
-    win.setCustomBackgroundColor(QColor(242, 242, 242), QColor(25, 33, 42))
     win.setMicaEffectEnabled(False)
     sys.exit(app.exec_())

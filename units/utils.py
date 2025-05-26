@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, Q_ARG, QMetaObject, Qt
 import json
 
 def root(component):
@@ -6,6 +6,15 @@ def root(component):
     while hasattr(component, 'parent') and component.parent() is not None:
         component = component.parent()
     return component
+
+def page(component, name: str):
+    """获取组件的子组件, 用于获取页面"""
+    main = root(component)
+    try:
+        return main.interface[name]['interface'].ui
+    except Exception as e:
+        print(f"Error getting page {name}: {e}")
+        return None
 
 
 from qfluentwidgets import MessageBox
@@ -103,3 +112,18 @@ class setting:
         print(config)
         with open('./config.json', 'w', encoding='utf-8') as f:
             json.dump(origin, f, ensure_ascii=False, indent=4)
+
+
+
+def invokeMain(component, method, *args):
+    # 将函数的调用转发到主线程
+    def get_arg_type(arg):
+        inner_type = (int, float, str, bool, list, dict)
+        if isinstance(arg, inner_type):
+            return type(arg)
+        return object
+    arg_types = [get_arg_type(arg) for arg in args]
+    arg_alist = [Q_ARG(arg_type, arg) for arg_type, arg in zip(arg_types, args)]
+    QMetaObject.invokeMethod(
+        component, method, Qt.QueuedConnection, *arg_alist
+    )

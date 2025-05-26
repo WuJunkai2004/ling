@@ -121,20 +121,35 @@
       </spacer>
      </item>
      <item>
-      <widget class="file_get_label" name="label">
+      <widget class="QStackedWidget" name="switch_show">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
-        <string notr="true">font: 28pt &quot;微软雅黑&quot;;
-background-color: rgb(235, 235, 235);</string>
+        <string notr="true">border: 2px dashed gray;</string>
        </property>
-       <property name="text">
-        <string>请将文件拖拽至此</string>
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
+       <widget class="file_get_label" name="inputs">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: None;</string>
+        </property>
+       </widget>
+       <widget class="file_loading_ring" name="loads">
+        <property name="styleSheet">
+         <string notr="true">border: None;</string>
+        </property>
+       </widget>
       </widget>
      </item>
      <item>
@@ -189,8 +204,15 @@ background-color: rgb(235, 235, 235);</string>
   </customwidget>
   <customwidget>
    <class>file_get_label</class>
-   <extends>QLabel</extends>
+   <extends>QWidget</extends>
    <header>units.open</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>file_loading_ring</class>
+   <extends>QWidget</extends>
+   <header>units.open</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
