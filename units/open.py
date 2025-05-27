@@ -68,13 +68,11 @@ class file_get_label(QWidget):
 
     def loader(self):
         print("loader in open.file_get_label")
-        self.setAcceptDrops(False)
         utils.page(self, 'open').switch_show.setCurrentIndex(1)
 
     def stop_loader(self):
         """停止加载动画"""
         print("stop_loader in open.file_get_label")
-        self.setAcceptDrops(True)
         utils.page(self, 'open').switch_show.setCurrentIndex(0)
 
 
