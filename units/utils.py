@@ -84,7 +84,7 @@ class promise(QThread):
         
 
 def cfg(*key: str):
-    with open('./config.json', 'r', encoding='utf-8') as f:
+    with open('./data/config.json', 'r', encoding='utf-8') as f:
         config = json.load(f)
     for k in key:
         try:

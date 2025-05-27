@@ -68,7 +68,12 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         super().__init__(parent)
         self.chat = None
         self.token = None
+        self.file_name = None
         self.resizeEvent = self.onResizeEvent
+
+    def set_file_name(self, file_name):
+        print("set_file_name in read.reader")
+        self.file_name = file_name
 
     @pyqtSlot(str)
     def read(self, token:str):
@@ -115,6 +120,13 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         self.parent().ui.right_edge.setLayout(self.chat.chat_layout)
         self.parent().ui.right_edge.setFixedWidth(200)
 
+    def mark_favorite(self):
+        print("mark_favorite")
+        if self.file_name is None:
+            utils.alert("提示", "请先打开一篇文章。", utils.root(self))
+            return
+        utils.shelf('./data/shelf.txt').add(self.file_name)
+
 
 from qfluentwidgets import ToolButton
 class chatIcon(ToolButton):
@@ -122,3 +134,10 @@ class chatIcon(ToolButton):
         super().__init__(parent)
         self.setIcon(FIF.CHAT)
         print("chatIcon")
+
+
+class starIcon(ToolButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setIcon(FIF.TAG)
+        print("starIcon")

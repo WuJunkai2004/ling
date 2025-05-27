@@ -125,6 +125,7 @@ class MainWin(FluentWindow):
         self.interface['open']['interface'].ui.inputs.stop_loader()
 
     def openFile(self, file_path):
+        self.interface['read']['interface'].ui.widget.set_file_name(file_path)
         # 打开文件的逻辑
         def file_check_md5():
             print('文件检查中...')
