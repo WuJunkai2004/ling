@@ -179,7 +179,7 @@ class MainWin(FluentWindow):
                 "display": 0, # 记住: remember, 忘记: forget
             }
         }
-        with open('./config.json', 'w', encoding='utf-8') as f:
+        with open('./data/config.json', 'w', encoding='utf-8') as f:
             json.dump(default_setting, f, ensure_ascii=False, indent=4)
 
 

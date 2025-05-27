@@ -1,11 +1,13 @@
 from PyQt5.QtCore import QThread, pyqtSignal, Q_ARG, QMetaObject, Qt
 import json
 
+
 def root(component):
     """获取组件的根组件, 用于回退到 winMain"""
     while hasattr(component, 'parent') and component.parent() is not None:
         component = component.parent()
     return component
+
 
 def page(component, name: str):
     """获取组件的子组件, 用于获取页面"""
@@ -114,7 +116,6 @@ class setting:
             json.dump(origin, f, ensure_ascii=False, indent=4)
 
 
-
 def invokeMain(component, method, *args):
     # 将函数的调用转发到主线程
     def get_arg_type(arg):
@@ -127,3 +128,26 @@ def invokeMain(component, method, *args):
     QMetaObject.invokeMethod(
         component, method, Qt.QueuedConnection, *arg_alist
     )
+
+
+class shelf:
+    """存储收藏和历史记录"""
+    def __init__(self, data_file):
+        self.file = data_file
+        self.temp = []
+    
+    def add(self, item):
+        """添加一个项目到收藏或历史记录"""
+        fout = open(self.file, 'a+', encoding='utf-8')
+        print(item, file=fout)
+        fout.close()
+        self.temp.append(item)
+
+    def get(self):
+        if self.temp:
+            return self.temp
+        fin = open(self.file, 'r', encoding='utf-8')
+        items = fin.readlines()
+        fin.close()
+        self.temp = [item.strip() for item in items if item.strip()]
+        return self.temp
