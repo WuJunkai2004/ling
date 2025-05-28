@@ -8,10 +8,10 @@ import time
 
 from PyQt5.QtCore    import Qt, pyqtSlot
 from PyQt5.QtGui     import QIcon, QFont
-from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QVBoxLayout
 
 from qfluentwidgets import FluentIcon as FIF
-from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel
+from qfluentwidgets import NavigationItemPosition, FluentWindow, SubtitleLabel, IndeterminateProgressRing
 
 from views.home import Ui_Form as Form_Home
 from views.info import Ui_Form as Form_Info
@@ -56,19 +56,18 @@ class Widget(QFrame):
 
     
 class Favor(QFrame):
-    # 收藏的文章，点击侧边栏对应按钮时，调用be_Click方法
-    # 不需要有具体的界面，唯一的作用是作为侧边栏的按钮，点击就跳转
-    def __init__(self, text: str, parent=None, Frame = None):
-        token, filename = text.split('|')
-        self.token = token
-        self.filename = filename
+    def __init__(self, text: str, parent=None, Frame=None):
         super().__init__(parent=parent)
+        token, filename = text.split('|')
         self.setObjectName(token)
-        self.label = SubtitleLabel(filename, self)
-        self.hBoxLayout = QHBoxLayout(self)
+        self.vBoxLayout = QVBoxLayout(self)
+        self.ring = IndeterminateProgressRing(parent=self)
+        self.ring.setFixedSize(80, 80)
+        self.vBoxLayout.addWidget(self.ring, 1, Qt.AlignCenter)
+        self.label = SubtitleLabel(f"正在打开: {os.path.basename(filename)}", self)
         self.label.setFont(QFont('Microsoft YaHei', 24))
         self.label.setAlignment(Qt.AlignCenter)
-        self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
+        self.vBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
 
 
 class MainWin(FluentWindow):
@@ -119,8 +118,11 @@ class MainWin(FluentWindow):
 
     def open_marked(self, index):
         name = self.stackedWidget.widget(index).objectName()
+
         if len(name) != 32:
             return
+
+        
         print(f"打开收藏: {name}")
         utils.promise(self, self.switchReader, name).start()
 
