@@ -115,6 +115,14 @@ class MainWin(FluentWindow):
         self.setWindowTitle('灵犀摘')
         self.navigationInterface.setMinimumExpandWidth(900)
         self.navigationInterface.expand(useAni=False)
+        self.stackedWidget.currentChanged.connect(self.open_marked)
+
+    def open_marked(self, index):
+        name = self.stackedWidget.widget(index).objectName()
+        if len(name) != 32:
+            return
+        print(f"打开收藏: {name}")
+        utils.promise(self, self.switchReader, name).start()
 
     def setInterface(self, name: str, text: str, /, *, form: Widget = None, 
                      icon: QIcon = QIcon(), parent=None, position=NavigationItemPosition.TOP):
