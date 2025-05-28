@@ -156,6 +156,7 @@
    <header>units.sets</header>
    <slots>
     <slot>changeChatbar(int)</slot>
+    <slot>init_setting(QString)</slot>
    </slots>
   </customwidget>
  </customwidgets>
@@ -174,6 +175,22 @@
     <hint type="destinationlabel">
      <x>152</x>
      <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Form</sender>
+   <signal>objectNameChanged(QString)</signal>
+   <receiver>label</receiver>
+   <slot>init_setting(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>404</x>
+     <y>319</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>404</x>
+     <y>42</y>
     </hint>
    </hints>
   </connection>

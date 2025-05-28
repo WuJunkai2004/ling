@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QThread, pyqtSignal, Q_ARG, QMetaObject, Qt
+from PyQt5.QtWidgets import QFrame
 import json
 
 
@@ -100,7 +101,7 @@ class setting:
         self.keys = keys
     
     def __call__(self, value):
-        with open('./config.json', 'r', encoding='utf-8') as f:
+        with open('./data/config.json', 'r', encoding='utf-8') as f:
             origin = json.load(f)
             config = origin
         for k in self.keys[:-1]:
@@ -112,7 +113,7 @@ class setting:
             return
         config[self.keys[-1]] = value
         print(config)
-        with open('./config.json', 'w', encoding='utf-8') as f:
+        with open('./data/config.json', 'w', encoding='utf-8') as f:
             json.dump(origin, f, ensure_ascii=False, indent=4)
 
 
