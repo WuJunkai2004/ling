@@ -160,5 +160,3 @@ please answer the question:
         "answer": answer,
         "message": "Success"
     })
-
-    

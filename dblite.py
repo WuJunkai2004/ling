@@ -91,7 +91,7 @@ class TABLE:
         return bool(self.cursor.fetchone())
     
     def __len__(self):
-        self.cursor.execute("SELECT COUNT(*) FROM {}".format(self.name))
+        self.cursor.execute('SELECT COUNT(*) FROM "{}"'.format(self.name))
         return self.cursor.fetchone()[0]
 
 

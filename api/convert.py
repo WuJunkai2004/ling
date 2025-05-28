@@ -15,6 +15,7 @@ def convert(response: vercel.API, data):
         cmd = [
             'pdf2htmlEX',
             '--fit-width', '800',
+            '--process-outline', '0',
             './var/files/' + data['token'] + '.pdf',
             './var/html/' + data['token'] + '.html',
         ]
