@@ -37,7 +37,6 @@ class Page_Sets(Form_Sets):
         super().setupUi(Form)
         print('设置界面')
         self.set_chatbar.setCurrentIndex(utils.cfg('helper', 'display'))
-    
 
 
 class Widget(QFrame):
@@ -55,6 +54,22 @@ class Widget(QFrame):
         # 必须给子界面设置全局唯一的对象名
         self.setObjectName(text.replace(' ', '-'))
 
+    
+class Favor(QFrame):
+    # 收藏的文章，点击侧边栏对应按钮时，调用be_Click方法
+    # 不需要有具体的界面，唯一的作用是作为侧边栏的按钮，点击就跳转
+    def __init__(self, text: str, parent=None, Frame = None):
+        token, filename = text.split('|')
+        self.token = token
+        self.filename = filename
+        super().__init__(parent=parent)
+        self.setObjectName(token)
+        self.label = SubtitleLabel(filename, self)
+        self.hBoxLayout = QHBoxLayout(self)
+        self.label.setFont(QFont('Microsoft YaHei', 24))
+        self.label.setAlignment(Qt.AlignCenter)
+        self.hBoxLayout.addWidget(self.label, 1, Qt.AlignCenter)
+
 
 class MainWin(FluentWindow):
     """ 主界面 """
@@ -71,13 +86,28 @@ class MainWin(FluentWindow):
         self.setInterface('read', '正在阅读',   form=Form_Read, icon=FIF.EDIT)
         self.set_________()
         self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
+        self.setFavorites()
         self.set_________(position=NavigationItemPosition.BOTTOM)
         self.setInterface('sets', '设置',       form=Page_Sets, icon=FIF.SETTING,
                           position=NavigationItemPosition.BOTTOM)
         self.setInterface('info', '关于',       form=Form_Info, icon=FIF.INFO,
                           position=NavigationItemPosition.BOTTOM)
-
         self.initWindow()
+
+    def setFavorites(self):
+        marked = utils.shelf('./data/favor.txt')
+        for text in marked.get():
+            texts = text.split('|')
+            if len(texts) < 2:
+                continue
+            token, filename = texts[0], texts[1]
+            widget = Favor(text, self)
+            self.interface[token] = {
+                'interface': widget,  # 界面
+                'navigater': self.addSubInterface(widget, QIcon(), os.path.basename(filename),
+                                                  parent=self.interface['mark']['interface'])
+            }
+
 
     def initWindow(self):
         self.resize(1080, 700)

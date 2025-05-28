@@ -77,6 +77,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
 
     @pyqtSlot(str)
     def read(self, token:str):
+        utils.page(self, "open").switch_show.setCurrentIndex(0)
         print("openUrl in read.reader")
         print(f"http://47.121.28.18:8000/var/html/{token}.html")
         url = QUrl(f"http://47.121.28.18:8000/var/html/{token}.html")
@@ -122,10 +123,10 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
 
     def mark_favorite(self):
         print("mark_favorite")
-        if self.file_name is None:
+        if self.file_name is None or self.token is None or self.token == "chat_test":
             utils.alert("提示", "请先打开一篇文章。", utils.root(self))
             return
-        utils.shelf('./data/shelf.txt').add(self.file_name)
+        utils.shelf('./data/favor.txt').add(f"{self.token}|{self.file_name}")
 
 
 from qfluentwidgets import ToolButton
