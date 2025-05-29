@@ -18,6 +18,7 @@ from views.info import Ui_Form as Form_Info
 from views.open import Ui_Form as Form_Open
 from views.read import Ui_Form as Form_Read
 from views.sets import Ui_Form as Form_Sets
+from views.hist import Ui_Form as Form_Hist
 
 import units.utils as utils
 
@@ -73,7 +74,7 @@ class MainWin(FluentWindow):
 
         self.setInterface('home', '首页',       form=Form_Home, icon=FIF.HOME)
         self.setInterface('open', '打开文件',   form=Form_Open, icon=FIF.VIEW)
-        self.setInterface('hist', '阅读历史',   form=None, icon=FIF.HISTORY)
+        self.setInterface('hist', '阅读历史',   form=Form_Hist, icon=FIF.HISTORY)
         self.set_________()
         self.setInterface('read', '正在阅读',   form=Form_Read, icon=FIF.EDIT)
         self.set_________()

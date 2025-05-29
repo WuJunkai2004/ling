@@ -1,0 +1,50 @@
+from . import utils
+import os
+
+
+from qfluentwidgets import CardWidget, BodyLabel, SingleDirectionScrollArea
+from PyQt5.QtWidgets import QVBoxLayout, QLabel
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+class AppCard(CardWidget):
+    def __init__(self, token, filename, parent=None):
+        super().__init__(parent)
+        self.token = token
+        self.filename = filename
+        self.setFixedSize(150, 250)
+        self.vLayout = QVBoxLayout(self)
+        self.picture = QLabel(self, objectName='picture')
+        self.picture.setStyleSheet('background-color: #f0f0f0;')
+        self.picture.setAlignment(Qt.AlignCenter)
+        pic_path = os.path.join('./data/pics/', token + '.jpg')
+        if os.path.exists(pic_path):
+            self.picture.setPixmap(QPixmap(pic_path).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        else:
+            self.picture.setText('No Image')
+        self.vLayout.addWidget(self.picture)
+        self.text = BodyLabel(os.path.basename(filename), self)
+        self.text.setWordWrap(True)
+        self.text.setAlignment(Qt.AlignCenter)
+        self.vLayout.addWidget(self.text)
+        self.clicked.connect(self.click)
+    
+    def click(self):
+        # 点击卡片时，打开对应的文件
+        print(f"Opening file: {self.filename}")
+        print(f"Token: {self.token}")
+
+
+from qfluentwidgets import TitleLabel
+class historys(TitleLabel):
+    def init_history(self, text):
+        print("test_form", text)
+        self.parent().ui.waterflow.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        for text in utils.shelf('./data/history.txt').get():
+            texts = text.split('|')
+            if len(texts) != 2:
+                continue
+            token, filename = texts
+            card = AppCard(token, filename, self)
+            self.parent().ui.waterflow.addWidget(card)
+            for i in range(10):
+                self.parent().ui.waterflow.addWidget(AppCard(token, filename, self))
