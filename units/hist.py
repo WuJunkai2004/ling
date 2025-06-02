@@ -2,9 +2,9 @@ from . import utils
 import os
 
 
-from qfluentwidgets import CardWidget, BodyLabel, SingleDirectionScrollArea
-from PyQt5.QtWidgets import QVBoxLayout, QLabel
-from PyQt5.QtCore import Qt
+from qfluentwidgets import CardWidget, BodyLabel
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QWidget, QPushButton
+from PyQt5.QtCore import Qt, QEasingCurve
 from PyQt5.QtGui import QPixmap
 class AppCard(CardWidget):
     def __init__(self, token, filename, parent=None):
@@ -38,13 +38,28 @@ from qfluentwidgets import TitleLabel
 class historys(TitleLabel):
     def init_history(self, text):
         print("test_form", text)
-        self.parent().ui.waterflow.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         for text in utils.shelf('./data/history.txt').get():
             texts = text.split('|')
             if len(texts) != 2:
                 continue
             token, filename = texts
-            card = AppCard(token, filename, self)
-            self.parent().ui.waterflow.addWidget(card)
             for i in range(10):
-                self.parent().ui.waterflow.addWidget(AppCard(token, filename, self))
+                self.parent().ui.waterflow.addCard(token, filename)
+        self.setStyleSheet('background-color: white;')
+        
+
+from qfluentwidgets import FlowLayout
+class history_flow(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName('history_flow')
+        self.flow = FlowLayout(self, needAni=True)
+        self.flow.setAnimation(250, QEasingCurve.OutQuad)
+        self.flow.setContentsMargins(30, 30, 30, 30)
+        self.flow.setVerticalSpacing(20)
+        self.flow.setHorizontalSpacing(10)
+        self.flow.setAlignment(Qt.AlignCenter)
+
+    def addCard(self, token, filename):
+        card = AppCard(token, filename, self)
+        self.flow.addWidget(card)

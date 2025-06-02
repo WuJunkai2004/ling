@@ -65,18 +65,24 @@
       </widget>
      </item>
      <item>
-      <widget class="QScrollArea" name="scrollArea">
+      <widget class="SingleDirectionScrollArea" name="scrollArea">
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
-       <widget class="FlowLayout" name="waterflow">
+       <widget class="history_flow" name="waterflow">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
           <width>696</width>
-          <height>574</height>
+          <height>568</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </widget>
@@ -111,9 +117,16 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>FlowLayout</class>
-   <extends>QVBoxLayout</extends>
+   <class>SingleDirectionScrollArea</class>
+   <extends>QScrollArea</extends>
    <header>qfluentwidgets</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>history_flow</class>
+   <extends>QWidget</extends>
+   <header>units.hist</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
