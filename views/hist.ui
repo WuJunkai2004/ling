@@ -65,7 +65,21 @@
       </widget>
      </item>
      <item>
-      <layout class="FlowLayout" name="waterflow"/>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="FlowLayout" name="waterflow">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>696</width>
+          <height>574</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
      </item>
     </layout>
    </item>
