@@ -203,20 +203,19 @@ class MainWin(FluentWindow):
              .start()
     
     def initSetting(self):
-        if os.path.exists('./config.json'):
-            return
-        default_setting = {
-            'helper': {
-                "require": ["float", "fixed"],
-                'display': 0, # 浮动: float, 固定: fixed
-            },
-            "history": {
-                "require": ["remember", "forget"],
-                "display": 0, # 记住: remember, 忘记: forget
+        if not os.path.exists('./data/config.json'):
+            default_setting = {
+                'helper': {
+                    "require": ["float", "fixed"],
+                    'display': 0, # 浮动: float, 固定: fixed
+                },
+                "history": {
+                    "require": ["remember", "forget"],
+                    "display": 0, # 记住: remember, 忘记: forget
+                }
             }
-        }
-        with open('./data/config.json', 'w', encoding='utf-8') as f:
-            json.dump(default_setting, f, ensure_ascii=False, indent=4)
+            with open('./data/config.json', 'w', encoding='utf-8') as f:
+                json.dump(default_setting, f, ensure_ascii=False, indent=4)
         if os.path.exists('./data/marks.db'):
             return
         db = dataset.connect('sqlite:///./data/marks.db')

@@ -12,5 +12,4 @@ class settingTitle(TitleLabel):
 
     def init_setting(self, text):
         print("test_form", text)
-        print(self.parent())
         self.parent().ui.set_chatbar.setCurrentIndex(utils.cfg('helper', 'display'))

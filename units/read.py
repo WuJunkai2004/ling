@@ -111,6 +111,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             self.token = "chat_test"
         if self.chat is None:
             self.chat = ChatBar(self, self.token)
+        self.onResizeEvent(None)  # Trigger resize to set initial size
         if utils.cfg("helper", "display") == 0:
             Flyout.make(self.chat, self.parent().ui.right_edge, self, FlyoutAnimationType.SLIDE_LEFT, False)
             return
