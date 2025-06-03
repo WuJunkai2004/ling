@@ -26,14 +26,21 @@ class ChatBar(FlyoutViewBase):
         self.chat_layout.addWidget(self.chat_input)
 
         self.send_button = PushButton("发送", self)
-        self.send_button.clicked.connect(self.send_message)
+        self.send_button.clicked.connect(self.start_send)
         self.chat_layout.addWidget(self.send_button)
         
         self.chat_layout.setContentsMargins(10, 10, 10, 10)
         self.chat_layout.setSpacing(10)
         self.setFixedSize(200, 600)
 
-    def send_message(self):
+    def start_send(self):
+        utils.page(self, "read").widget.page().runJavaScript(
+            "window.getSelection().toString();", 
+            self.send_message
+        )
+
+    def send_message(self, selected_text):
+        print(f"选中的文本: {selected_text}")
         user_text = self.chat_input.toPlainText().strip()
         self.chat_input.clear()
         if not user_text:
@@ -43,7 +50,7 @@ class ChatBar(FlyoutViewBase):
 
         payload = {
             "msg": user_text,
-            "selection": "",
+            "selection": selected_text,
             "token": self.token,
         }
 
@@ -134,12 +141,20 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             return
         marks.insert({'token': self.token, 'filename': self.file_name})
 
+    def start_trans(self):
+        # 获取WebEngineView中的选中文本
+        self.page().runJavaScript("window.getSelection().toString();", self.onTextSelectedForTrans)
+
+    def onTextSelectedForTrans(self, text):
+        print(f"用户选择的文字: //{text}//")
+
 
 from qfluentwidgets import ToolButton
 class chatIcon(ToolButton):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setIcon(FIF.CHAT)
+        self.setToolTip("开启AI对话")
         print("chatIcon")
 
 
@@ -147,4 +162,23 @@ class starIcon(ToolButton):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setIcon(FIF.TAG)
+        self.setToolTip("标记为收藏")
+        self.is_marked = False
         print("starIcon")
+
+    def toggle(self):
+        if self.is_marked:
+            # 切换成未标记状态，图标颜色变深
+            self.setIcon(FIF.TAG, color="black")
+        else:
+            # 切换成标记状态，图标颜色变浅
+            self.setIcon(FIF.TAG, color="yellow")
+        self.is_marked = not self.is_marked
+
+
+class transIcon(ToolButton):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setIcon(FIF.LANGUAGE)
+        self.setToolTip("翻译")
+        print("transIcon")

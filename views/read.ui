@@ -30,6 +30,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="transIcon" name="tranIcon">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="starIcon" name="starIcon">
        <property name="text">
         <string/>
@@ -76,6 +83,7 @@
    <slots>
     <slot>start_chat()</slot>
     <slot>mark_favorite()</slot>
+    <slot>start_trans()</slot>
    </slots>
   </customwidget>
   <customwidget>
@@ -88,6 +96,11 @@
   </customwidget>
   <customwidget>
    <class>starIcon</class>
+   <extends>QToolButton</extends>
+   <header>units.read</header>
+  </customwidget>
+  <customwidget>
+   <class>transIcon</class>
    <extends>QToolButton</extends>
    <header>units.read</header>
   </customwidget>
@@ -123,6 +136,22 @@
     <hint type="destinationlabel">
      <x>756</x>
      <y>335</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tranIcon</sender>
+   <signal>clicked()</signal>
+   <receiver>widget</receiver>
+   <slot>start_trans()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>728</x>
+     <y>169</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>686</x>
+     <y>357</y>
     </hint>
    </hints>
   </connection>
