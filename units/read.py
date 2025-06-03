@@ -143,13 +143,30 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
 
     def start_trans(self):
         # 获取WebEngineView中的选中文本
-        self.page().runJavaScript("window.getSelection().toString();", self.onTextSelectedForTrans)
+        self.page().runJavaScript("window.getSelection().toString();", self.translate)
 
-    def onTextSelectedForTrans(self, text):
+    def translate(self, text):
         print(f"用户选择的文字: //{text}//")
+        if not text:
+            utils.alert("提示", "请先选择要翻译的文本。", utils.root(self))
+            return
+        url = "http://47.121.28.18:8000/api/trans"
+        payload = {
+            "text": text,
+            "token": self.token,
+        }
+        try:
+            res = requests.post(url, json=payload).json()
+        except:
+            utils.alert("请求失败", "请检查网络连接或API服务。", utils.root(self))
+            return
+        if res['success'] == False:
+            utils.alert("云端错误", "请联系管理员。", utils.root(self))
+            return
+        print(f"翻译结果 {res['text']}")
 
 
-from qfluentwidgets import ToolButton
+from qfluentwidgets import ToolButton, FluentIconBase
 class chatIcon(ToolButton):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -169,10 +186,10 @@ class starIcon(ToolButton):
     def toggle(self):
         if self.is_marked:
             # 切换成未标记状态，图标颜色变深
-            self.setIcon(FIF.TAG, color="black")
+            self.setIcon(FluentIconBase.icon(FIF.TAG, color="black"))
         else:
             # 切换成标记状态，图标颜色变浅
-            self.setIcon(FIF.TAG, color="yellow")
+            self.setIcon(FluentIconBase.icon(FIF.TAG, color="red"))
         self.is_marked = not self.is_marked
 
 
