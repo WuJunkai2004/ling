@@ -126,7 +126,12 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         if self.file_name is None or self.token is None or self.token == "chat_test":
             utils.alert("提示", "请先打开一篇文章。", utils.root(self))
             return
-        utils.shelf('./data/favor.txt').add(f"{self.token}|{self.file_name}")
+        db = utils.dataset.connect('sqlite:///./data/marks.db')
+        marks = db['marks']
+        if marks.find_one(token=self.token, file_name=self.file_name):
+            utils.alert("提示", "该文章已被标记为收藏。", utils.root(self))
+            return
+        marks.insert({'token': self.token, 'filename': self.file_name})
 
 
 from qfluentwidgets import ToolButton

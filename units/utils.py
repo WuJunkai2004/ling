@@ -129,26 +129,3 @@ def invokeMain(component, method, *args):
     QMetaObject.invokeMethod(
         component, method, Qt.QueuedConnection, *arg_alist
     )
-
-
-class shelf:
-    """存储收藏和历史记录"""
-    def __init__(self, data_file):
-        self.file = data_file
-        self.temp = []
-    
-    def add(self, item):
-        """添加一个项目到收藏或历史记录"""
-        fout = open(self.file, 'a+', encoding='utf-8')
-        print(item, file=fout)
-        fout.close()
-        self.temp.append(item)
-
-    def get(self):
-        if self.temp:
-            return self.temp
-        fin = open(self.file, 'r', encoding='utf-8')
-        items = fin.readlines()
-        fin.close()
-        self.temp = [item.strip() for item in items if item.strip()]
-        return self.temp

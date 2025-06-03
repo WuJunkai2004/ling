@@ -6,6 +6,8 @@ import requests
 import sys
 import time
 
+import dataset
+
 from PyQt5.QtCore    import Qt, pyqtSlot
 from PyQt5.QtGui     import QIcon, QFont
 from PyQt5.QtWidgets import QApplication, QFrame, QHBoxLayout, QVBoxLayout
@@ -88,12 +90,11 @@ class MainWin(FluentWindow):
         self.initWindow()
 
     def setFavorites(self):
-        marked = utils.shelf('./data/favor.txt')
-        for text in marked.get():
-            texts = text.split('|')
-            if len(texts) < 2:
-                continue
-            token, filename = texts[0], texts[1]
+        db = dataset.connect('sqlite:///./data/marks.db')
+        marked = db['mark']
+        for text in marked:
+            token = text['token']
+            filename = text['filename']
             widget = Favor(text, self)
             self.interface[token] = {
                 'interface': widget,  # 界面
@@ -216,6 +217,11 @@ class MainWin(FluentWindow):
         }
         with open('./data/config.json', 'w', encoding='utf-8') as f:
             json.dump(default_setting, f, ensure_ascii=False, indent=4)
+        if os.path.exists('./data/marks.db'):
+            return
+        db = dataset.connect('sqlite:///./data/marks.db')
+        db.query('CREATE TABLE IF NOT EXISTS mark (token TEXT PRIMARY KEY, filename TEXT)')
+        db.query('CREATE TABLE IF NOT EXISTS history (token TEXT PRIMARY KEY, filename TEXT)')
 
 
 if __name__ == "__main__":

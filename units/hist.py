@@ -1,5 +1,6 @@
 from . import utils
 import os
+import dataset
 
 
 from qfluentwidgets import CardWidget, BodyLabel
@@ -38,13 +39,12 @@ from qfluentwidgets import TitleLabel
 class historys(TitleLabel):
     def init_history(self, text):
         print("test_form", text)
-        for text in utils.shelf('./data/history.txt').get():
-            texts = text.split('|')
-            if len(texts) != 2:
-                continue
-            token, filename = texts
-            for i in range(10):
-                self.parent().ui.waterflow.addCard(token, filename)
+        db = dataset.connect('sqlite:///./data/marks.db')
+        history = db['history']
+        for item in history:
+            token = item['token']
+            filename = item['filename']
+            self.parent().ui.waterflow.addCard(token, filename)
         self.setStyleSheet('background-color: white;')
         
 
