@@ -70,10 +70,31 @@ class ChatBar(FlyoutViewBase):
         self.chat_display.appendHtml(f"<b>LLM:</b> {res['answer']}<br>")
 
 
+class TransBar(FlyoutViewBase):
+    def __init__(self, parent, token):
+        super().__init__(parent)
+        self.trans_layout = QVBoxLayout(self)
+
+        self.trans_display = PlainTextEdit(self)
+        self.trans_display.setReadOnly(True)
+        self.trans_layout.addWidget(self.trans_display)
+
+        self.trans_layout.setContentsMargins(10, 10, 10, 10)
+        self.trans_layout.setSpacing(10)
+        self.setFixedSize(200, 600)
+
+
+    def add_translation(self, original_text, translated_text):
+        self.trans_display.appendHtml(f"<b>原文:</b> {original_text}<br>")
+        self.trans_display.appendHtml(f"<b>翻译:</b> {translated_text}<br><br>")
+    
+
+
 class reader(FramelessWebEngineView): # Changed base class to QWidget
     def __init__(self, parent=None):
         super().__init__(parent)
         self.chat = None
+        self.tran = None
         self.token = None
         self.file_name = None
         self.resizeEvent = self.onResizeEvent
@@ -110,6 +131,8 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         if self.chat:
             self.chat.setFixedSize(int(self.width()*0.25), int(self.height() - 20) )
             self.chat.chat_input.setFixedHeight(max(int(self.height()*0.2 - 20), 50))
+        if self.tran:
+            self.tran.setFixedSize(int(self.width()*0.25), int(self.height() - 20) )
         super().resizeEvent(event)
 
     def start_chat(self):
@@ -142,7 +165,12 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         marks.insert({'token': self.token, 'filename': self.file_name})
 
     def start_trans(self):
+        if self.token is None:
+            return
+        if self.tran is None:
+            self.tran = TransBar(self, self.token)
         # 获取WebEngineView中的选中文本
+        Flyout.make(self.tran, self.parent().ui.right_edge, self, FlyoutAnimationType.SLIDE_LEFT, False)
         self.page().runJavaScript("window.getSelection().toString();", self.translate)
 
     def translate(self, text):
@@ -164,6 +192,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             utils.alert("云端错误", "请联系管理员。", utils.root(self))
             return
         print(f"翻译结果 {res['text']}")
+        self.tran.add_translation(text, res['text'])
 
 
 from qfluentwidgets import ToolButton, FluentIconBase
