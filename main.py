@@ -54,6 +54,7 @@ class Widget(QFrame):
 class Favor(QFrame):
     def __init__(self, text: str, parent=None, Frame=None):
         super().__init__(parent=parent)
+        print(f"创建收藏: {text}")
         token, filename = text.split('|')
         self.setObjectName(token)
         self.vBoxLayout = QVBoxLayout(self)
@@ -80,7 +81,7 @@ class MainWin(FluentWindow):
         self.set_________()
         self.setInterface('read', '正在阅读',   form=Form_Read, icon=FIF.EDIT)
         self.set_________()
-        self.setInterface('mark', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
+        self.setInterface('marks', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
         self.setFavorites()
         self.set_________(position=NavigationItemPosition.BOTTOM)
         self.setInterface('sets', '设置',       form=Form_Sets, icon=FIF.SETTING,
@@ -91,15 +92,15 @@ class MainWin(FluentWindow):
 
     def setFavorites(self):
         db = dataset.connect('sqlite:///./data/marks.db')
-        marked = db['mark']
+        marked = db['marks']
         for text in marked:
             token = text['token']
             filename = text['filename']
-            widget = Favor(text, self)
+            widget = Favor(f"{token}|{filename}", self)
             self.interface[token] = {
                 'interface': widget,  # 界面
                 'navigater': self.addSubInterface(widget, QIcon(), os.path.basename(filename),
-                                                  parent=self.interface['mark']['interface'])
+                                                  parent=self.interface['marks']['interface'])
             }
 
 

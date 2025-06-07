@@ -43,7 +43,8 @@ class historys(TitleLabel):
         history = db['history']
         for item in history:
             token = item['token']
-            filename = item['filename']
+            filename = item['file_name']
+            print(f"Adding card for token: {token}, filename: {filename}")
             self.parent().ui.waterflow.addCard(token, filename)
         self.setStyleSheet('background-color: white;')
         

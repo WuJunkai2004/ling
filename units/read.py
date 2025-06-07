@@ -2,6 +2,7 @@ from PyQt5.QtCore import QUrl, pyqtSlot
 from PyQt5.QtWidgets import QVBoxLayout, QApplication # Added imports
 import requests # Added for API calls
 import json # Added for JSON handling
+import dataset
 from . import utils
 
 from qframelesswindow.webengine import FramelessWebEngineView
@@ -116,6 +117,11 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             self.chat.chat_display.clear()
         self.token = token
         print("openUrl in read.reader end")
+        db = dataset.connect('sqlite:///./data/marks.db')
+        history = db['history']
+        if not history.find_one(token=token):
+            history.insert({'token': token, 'file_name': self.file_name})
+            db.commit()
 
     def onLinkClicked(self, url):
         print(f"用户点击了链接: {url.toString()}")
@@ -157,12 +163,13 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         if self.file_name is None or self.token is None or self.token == "chat_test":
             utils.alert("提示", "请先打开一篇文章。", utils.root(self))
             return
-        db = utils.dataset.connect('sqlite:///./data/marks.db')
+        db = dataset.connect('sqlite:///./data/marks.db')
         marks = db['marks']
         if marks.find_one(token=self.token, file_name=self.file_name):
             utils.alert("提示", "该文章已被标记为收藏。", utils.root(self))
             return
         marks.insert({'token': self.token, 'filename': self.file_name})
+        db.commit()
 
     def start_trans(self):
         if self.token is None:
