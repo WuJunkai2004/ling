@@ -36,12 +36,12 @@ class AppCard(CardWidget):
 
 
 from qfluentwidgets import TitleLabel
-class historys(TitleLabel):
-    def init_history(self, text):
+class marks(TitleLabel):
+    def init_mark(self, text):
         print("test_form", text)
         db = dataset.connect('sqlite:///./data/marks.db')
-        history = db['history']
-        for item in history:
+        mark = db['mark']
+        for item in mark:
             token = item['token']
             filename = item['filename']
             print(f"Adding card for token: {token}, filename: {filename}")
@@ -50,10 +50,10 @@ class historys(TitleLabel):
         
 
 from qfluentwidgets import FlowLayout
-class history_flow(QWidget):
+class mark_flow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setObjectName('history_flow')
+        self.setObjectName('mark_flow')
         self.flow = FlowLayout(self, needAni=True)
         self.flow.setAnimation(250, QEasingCurve.OutQuad)
         self.flow.setContentsMargins(30, 30, 30, 30)

@@ -21,6 +21,7 @@ from views.open import Ui_Form as Form_Open
 from views.read import Ui_Form as Form_Read
 from views.sets import Ui_Form as Form_Sets
 from views.hist import Ui_Form as Form_Hist
+from views.mark import Ui_Form as Form_Mark
 
 import units.utils as utils
 
@@ -81,7 +82,7 @@ class MainWin(FluentWindow):
         self.set_________()
         self.setInterface('read', '正在阅读',   form=Form_Read, icon=FIF.EDIT)
         self.set_________()
-        self.setInterface('marks', '收藏',       form=None,      icon=FIF.BOOK_SHELF)
+        self.setInterface('marks', '收藏',      form=Form_Mark, icon=FIF.BOOK_SHELF)
         self.setFavorites()
         self.set_________(position=NavigationItemPosition.BOTTOM)
         self.setInterface('sets', '设置',       form=Form_Sets, icon=FIF.SETTING,

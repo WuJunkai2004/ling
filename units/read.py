@@ -120,7 +120,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         db = dataset.connect('sqlite:///./data/marks.db')
         history = db['history']
         if not history.find_one(token=token):
-            history.insert({'token': token, 'file_name': self.file_name})
+            history.insert({'token': token, 'filename': self.file_name})
             db.commit()
 
     def onLinkClicked(self, url):
