@@ -26,6 +26,7 @@ class AppCard(CardWidget):
         # 点击卡片时，打开对应的文件
         print(f"Opening file: {self.filename}")
         print(f"Token: {self.token}")
+        utils.root(self).openFile(self.filename)
 
 
 from qfluentwidgets import TitleLabel
