@@ -97,12 +97,15 @@ class MainWin(FluentWindow):
         for text in marked:
             token = text['token']
             filename = text['filename']
-            widget = Favor(f"{token}|{filename}", self)
-            self.interface[token] = {
-                'interface': widget,  # 界面
-                'navigater': self.addSubInterface(widget, QIcon(), os.path.basename(filename),
-                                                  parent=self.interface['marks']['interface'])
-            }
+            self.addFavorite(token, filename)
+    
+    def addFavorite(self, token: str, filename: str):
+        widget = Favor(f"{token}|{filename}", self)
+        self.interface[token] = {
+            'interface': widget,  # 界面
+            'navigater': self.addSubInterface(widget, QIcon(), os.path.basename(filename),
+                                              parent=self.interface['marks']['interface'])
+        }
 
 
     def initWindow(self):
@@ -115,12 +118,12 @@ class MainWin(FluentWindow):
 
     def open_marked(self, index):
         name = self.stackedWidget.widget(index).objectName()
-
         if len(name) != 32:
             return
-
-        
         print(f"打开收藏: {name}")
+        filename = self.interface[name]['interface'].label.text().replace('正在打开: ', '')
+        print(f"文件名: {filename}")
+        self.interface['read']['interface'].ui.widget.set_file_name(filename)
         utils.promise(self, self.switchReader, name).start()
 
     def setInterface(self, name: str, text: str, /, *, form: Widget = None, 

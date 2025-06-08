@@ -59,7 +59,7 @@ class ChatBar(FlyoutViewBase):
         QApplication.processEvents()
 
         try:
-            res = requests.post("http://47.121.28.18:8000/api/chat/chat", json=payload).json()
+            res = requests.post("http://47.121.28.18:8000/api/chat/chat", json=payload, timeout=30).json()
         except:
             utils.alert("请求失败", "请检查网络连接或API服务。", utils.root(self))
             return
@@ -122,6 +122,20 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         if not history.find_one(token=token):
             history.insert({'token': token, 'filename': self.file_name})
             db.commit()
+        self.check_marked(token)
+
+    def check_marked(self, token: str):
+        print("check_marked in read.reader")
+        db = dataset.connect('sqlite:///./data/marks.db')
+        marks = db['mark']
+        # 仅在数据库中查找是否存在该token的标记
+        if marks.find_one(token=token):
+            print("该文章已被标记为收藏")
+            utils.page(self, "read").starIcon.set_is_marked()
+        else:
+            print("该文章未被标记为收藏")
+            utils.page(self, "read").starIcon.set_un_marked()
+
 
     def onLinkClicked(self, url):
         print(f"用户点击了链接: {url.toString()}")
@@ -168,8 +182,12 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
         if marks.find_one(token=self.token, file_name=self.file_name):
             utils.alert("提示", "该文章已被标记为收藏。", utils.root(self))
             return
+        if marks.find_one(token=self.token):
+            return
         marks.insert({'token': self.token, 'filename': self.file_name})
         db.commit()
+        utils.page(self, "read").starIcon.set_is_marked()
+        utils.root(self).addFavorite(self.token, self.file_name)
 
     def start_trans(self):
         if self.token is None:
@@ -218,6 +236,14 @@ class starIcon(ToolButton):
         self.setToolTip("标记为收藏")
         self.is_marked = False
         print("starIcon")
+
+    def set_is_marked(self):
+        self.is_marked = True
+        self.setIcon(FluentIconBase.icon(FIF.TAG, color="red"))
+
+    def set_un_marked(self):
+        self.is_marked = False
+        self.setIcon(FluentIconBase.icon(FIF.TAG, color="black"))
 
     def toggle(self):
         if self.is_marked:
