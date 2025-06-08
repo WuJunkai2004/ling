@@ -93,7 +93,7 @@ class MainWin(FluentWindow):
 
     def setFavorites(self):
         db = dataset.connect('sqlite:///./data/marks.db')
-        marked = db['marks']
+        marked = db['mark']
         for text in marked:
             token = text['token']
             filename = text['filename']

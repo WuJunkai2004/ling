@@ -164,7 +164,7 @@ class reader(FramelessWebEngineView): # Changed base class to QWidget
             utils.alert("提示", "请先打开一篇文章。", utils.root(self))
             return
         db = dataset.connect('sqlite:///./data/marks.db')
-        marks = db['marks']
+        marks = db['mark']
         if marks.find_one(token=self.token, file_name=self.file_name):
             utils.alert("提示", "该文章已被标记为收藏。", utils.root(self))
             return
