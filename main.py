@@ -208,6 +208,8 @@ class MainWin(FluentWindow):
              .start()
     
     def initSetting(self):
+        if not os.path.exists('./data'):
+            os.makedirs('./data')
         if not os.path.exists('./data/config.json'):
             default_setting = {
                 'helper': {

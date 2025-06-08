@@ -1,6 +1,9 @@
 from PyQt5.QtCore import QThread, pyqtSignal, Q_ARG, QMetaObject, Qt
-from PyQt5.QtWidgets import QFrame
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QLabel
 import json
+import os
+import requests
 
 
 def root(component):
@@ -129,3 +132,36 @@ def invokeMain(component, method, *args):
     QMetaObject.invokeMethod(
         component, method, Qt.QueuedConnection, *arg_alist
     )
+
+
+def __cover_load(token):
+    url = f'http://47.121.28.18:8000/var/cover/{token}.png'
+    local_path = f'./data/pics/{token}.png'
+    if not os.path.exists('./data/pics'):
+        os.makedirs('./data/pics')
+    if os.path.exists(local_path):
+        return
+    try:
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            with open(local_path, 'wb') as f:
+                f.write(response.content)
+            print(f'Cover image for {token} downloaded successfully.')
+        else:
+            print(f'Failed to download cover image for {token}. Status code: {response.status_code}')
+    except Exception as e:
+        print(f'Error downloading cover image for {token}: {e}')
+
+
+def cover(parent, token):
+    pic = QLabel(parent, objectName='picture')
+    pic.setStyleSheet('background-color: #f0f0f0;')
+    pic.setAlignment(Qt.AlignCenter)
+    local_path = f'./data/pics/{token}.png'
+    if not os.path.exists(local_path):
+        __cover_load(token)
+    if not os.path.exists(local_path):
+        pic.setText('No Image')
+    else:
+        pic.setPixmap(QPixmap(local_path).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+    return pic

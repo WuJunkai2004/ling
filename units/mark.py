@@ -14,14 +14,7 @@ class AppCard(CardWidget):
         self.filename = filename
         self.setFixedSize(150, 250)
         self.vLayout = QVBoxLayout(self)
-        self.picture = QLabel(self, objectName='picture')
-        self.picture.setStyleSheet('background-color: #f0f0f0;')
-        self.picture.setAlignment(Qt.AlignCenter)
-        pic_path = os.path.join('./data/pics/', token + '.jpg')
-        if os.path.exists(pic_path):
-            self.picture.setPixmap(QPixmap(pic_path).scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        else:
-            self.picture.setText('No Image')
+        self.picture = utils.cover(self, token)
         self.vLayout.addWidget(self.picture)
         self.text = BodyLabel(os.path.basename(filename), self)
         self.text.setWordWrap(True)
