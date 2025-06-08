@@ -39,7 +39,7 @@ def load_history(token):
             "role": "user",
             "content": question
         })
-    print(result)
+    print(f"histrory{result}")
 
     db.close()
     return result
@@ -88,11 +88,13 @@ def quest(question, token):
                             json=payload,
                             timeout=10)
         req = req.json()
-    except:
+    except Exception as e:
+        print(f"Failed to connect to DashScope API due to {e}")
         return {
             "success": False,
             "response": {}
         }
+    print(f"Request to DashScope API: {req}")
     return {
         "success": True,
         "response": req
@@ -100,11 +102,13 @@ def quest(question, token):
 
 
 def failed_response(response, code):
-    response.set_status_code(200)
+    print(f"Failed to process the request. The status code is {code}")
+    response.send_code(200)
     response.send_json({
         "success": False,
         "answer": "",
-        "message": f"Failed to process the request. The status code is {code}"
+        "message": f"Failed to process the request. The status code is {code}",
+        "msg": f"Failed to process the request. The status code is {code}"
     })
 
 

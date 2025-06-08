@@ -4,7 +4,7 @@ import random
 import json
 import hashlib
 
-url: str = "http://api.fanyi.baidu.com/api/trans/vip/translate"
+trans_url: str = "http://api.fanyi.baidu.com/api/trans/vip/translate"
 appid = '20250602002372171'
 appkey = 'tTwWnkfrs8HUcuA_c6M6'
 
@@ -26,14 +26,18 @@ def translate(text):
         'sign': sign
     }
     try:
-        response = requests.post(url, params=payload, headers=headers)
-    except:
+        response = requests.post(trans_url, params=payload, headers=headers)
+    except Exception as e:
+        print("error in post")
+        print(e)
         return ''
     if response.status_code != 200:
+        print("error in status code")
         return ''
     try:
         result = response.json()
     except:
+        print("error in json")
         return ''
     ret = ''
     for i in result['trans_result']:
@@ -42,6 +46,7 @@ def translate(text):
 
 
 def reply(response, success, text):
+    print(f"text = {text}")
     response.send_code(200)
     response.send_json({
         "success": success,
