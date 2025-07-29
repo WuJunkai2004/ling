@@ -8,6 +8,7 @@ from langchain_community.document_loaders import PyMuPDFLoader
 import threading
 from langchain_community.embeddings import DashScopeEmbeddings
 from config import DASHSCOPE_API_KEY, EMBEDDING_MODEL
+from pydantic import BaseModel, Field
 
 def get_md5(file_content: io.BytesIO) -> str:
     """
@@ -19,6 +20,14 @@ def get_md5(file_content: io.BytesIO) -> str:
     chuck = file_content.read(8192)
     md5_hash.update(chuck)
     return md5_hash.hexdigest()
+
+
+class ArticleResults(BaseModel):
+    abstract:str = Field(description="Brief summary of the article's abstract")
+    key_findings:str = Field(description="The key findings of the article")
+    limitation_of_sota : str=Field(description="limitation of the existing work")
+    proposed_solution : str = Field(description="the proposed solution in details")
+    paper_limitations : str=Field(description="The limitations of the proposed solution of the paper")
 
 
 def process_pdf_to_vector(pdf_path):
@@ -62,6 +71,62 @@ def process_pdf_to_vector(pdf_path):
         print(f"Error processing PDF: {str(e)}")
 
 
+def increase_build_rag(pdf_path):
+    """增加RAG构建任务"""
+    from itext2kg import iText2KG
+    from langchain.document_loaders import PyPDFLoader
+    from itext2kg.documents_distiller import DocumentsDistiller
+    from typing import List, Tuple
+    from langchain_community.chat_models import ChatTongyi
+    from langchain_community.embeddings import ZhipuAIEmbeddings
+
+    print("load llm...")
+    llm_api_key = "sk-b278fb2336e74e5e99069e6c5845d877"
+    embeddings_api_key = "9004d12880604aa189d7a946c9e248af.9XnbjH4aHoR5ew0G"
+    llm = ChatTongyi(
+        api_key = llm_api_key,
+        model="qwen-turbo",
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
+    )
+    embeddings = ZhipuAIEmbeddings(
+        api_key = embeddings_api_key,
+        model="embedding-3",
+    )
+    documents_information = [
+        (pdf_path, [], ArticleResults, 'scientific article')
+    ]
+    loader = PyPDFLoader(pdf_path)
+    pages = loader.load_and_split()
+    document_distiller = DocumentsDistiller(llm_model=llm)
+    document_type = 'scientific article'
+    IE_query = f'''
+    # DIRECTIVES : 
+    - Act like an experienced information extractor.
+    - You have a chunk of a {document_type}
+    - If you do not find the right information, keep its place empty.
+    '''
+    # Distill document content with query
+    distilled_doc = document_distiller.distill(
+        documents=[page.page_content.replace("{", '[').replace("}", "]") for page in pages],
+        IE_query=IE_query,
+        output_data_structure=ArticleResults
+    )
+    distilled_docs = [
+        f"{document_type}'s {key} - {value}".replace("{", "[").replace("}", "]") 
+        for key, value in distilled_doc.items() 
+        if value and value != []
+    ]
+    itext2kg = iText2KG(llm_model = llm, embeddings_model = embeddings)
+    kg_loaded = itext2kg.load_graph("llm-tikg.json")
+    kg_incres = itext2kg.build_graph(sections=distilled_docs,
+                         existing_knowledge_graph=kg_loaded,
+                         rel_threshold=0.7, ent_threshold=0.7)
+    itext2kg.save_graph(kg_incres, "llm-tikg.json")
+
+
 @vercel.register
 def handler(response: vercel.API, url, data, headers):
     """处理PDF文件上传请求"""
@@ -90,7 +155,7 @@ def handler(response: vercel.API, url, data, headers):
 
     # 启动异步处理
     pdf_path = os.path.join('.', 'var', 'files', file_info)
-    thread = threading.Thread(target=process_pdf_to_vector, args=(pdf_path,))
+    thread = threading.Thread(target=increase_build_rag, args=(pdf_path,))
     thread.daemon = True  # 设置为守护线程
     thread.start()
 

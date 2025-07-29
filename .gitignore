@@ -183,3 +183,8 @@ views/*.py
 
 # 服务器数据目录
 var/
+*.txt
+
+# 大型数据
+kgs/*
+iText2KGPro
