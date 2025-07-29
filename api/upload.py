@@ -76,7 +76,6 @@ def increase_build_rag(pdf_path):
     from itext2kg import iText2KG
     from langchain.document_loaders import PyPDFLoader
     from itext2kg.documents_distiller import DocumentsDistiller
-    from typing import List, Tuple
     from langchain_community.chat_models import ChatTongyi
     from langchain_community.embeddings import ZhipuAIEmbeddings
 
@@ -95,9 +94,6 @@ def increase_build_rag(pdf_path):
         api_key = embeddings_api_key,
         model="embedding-3",
     )
-    documents_information = [
-        (pdf_path, [], ArticleResults, 'scientific article')
-    ]
     loader = PyPDFLoader(pdf_path)
     pages = loader.load_and_split()
     document_distiller = DocumentsDistiller(llm_model=llm)
