@@ -71,6 +71,7 @@ def process_pdf_to_vector(pdf_path):
         print(f"Error processing PDF: {str(e)}")
 
 
+@vercel.daemon
 def increase_build_rag(pdf_path):
     """增加RAG构建任务"""
     from itext2kg import iText2KG
@@ -84,7 +85,7 @@ def increase_build_rag(pdf_path):
     embeddings_api_key = "9004d12880604aa189d7a946c9e248af.9XnbjH4aHoR5ew0G"
     llm = ChatTongyi(
         api_key = llm_api_key,
-        model="qwen-turbo",
+        model="qwen-turbo-latest",
         temperature=0,
         max_tokens=None,
         timeout=None,
@@ -151,9 +152,7 @@ def handler(response: vercel.API, url, data, headers):
 
     # 启动异步处理
     pdf_path = os.path.join('.', 'var', 'files', file_info)
-    thread = threading.Thread(target=increase_build_rag, args=(pdf_path,))
-    thread.daemon = True  # 设置为守护线程
-    thread.start()
+    increase_build_rag(pdf_path)
 
     response.send_code(200)
     response.send_headers({

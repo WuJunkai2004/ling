@@ -10,6 +10,7 @@ import sys
 import ast
 import inspect
 import logging
+import threading
 
 
 
@@ -357,6 +358,21 @@ class register:
         self.globals['data'] = data
         self.globals['headers'] = headers
         exec(self.globals['main'].__code__, self.globals)
+
+
+class daemon:
+    def __init__(self, func):
+        self.func = func
+        self.thread = None
+
+    def __call__(self, *args, **kwargs):
+        """Call to the function"""
+        if self.thread is None or not self.thread.is_alive():
+            self.thread = threading.Thread(target=self.func, args=args, kwargs=kwargs)
+            self.thread.daemon = True
+            self.thread.start()
+        else:
+            verlog.name('daemon')(f"Thread {self.thread.name} is already running.", level=logging.WARNING)
 
 
 def start(HandlerClass = API,
