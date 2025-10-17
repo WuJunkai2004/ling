@@ -329,35 +329,29 @@ class API(SEND):
         pass
 
 
-class macro(ast.NodeTransformer):
-    def visit_FunctionDef(self, node):
-        node.name = 'main'
-        node.args.args = []
-        node.decorator_list = []
-        return node
-
 class register:
     def __init__(self, func):
-        self.funname = func.__name__
-        self.globals = func.__globals__
-        self.macro(func)
-        self.globals['handler'] = self
+        self.func = func
+        self.func_args_names = inspect.getfullargspec(func).args
+        self.func.__globals__['handler'] = self
 
-    def macro(self, func):
-        func = inspect.getsource(func)
-        func = ast.parse(func)
-        func = macro().visit(func)
-        func = ast.fix_missing_locations(func)
-        func = ast.unparse(func)
-        exec(func, self.globals)
-    
     def vercel(self, response, url, data, headers):
-        self.globals['print'] = verlog.name(self.funname)
-        self.globals['response'] = response
-        self.globals['url'] = url
-        self.globals['data'] = data
-        self.globals['headers'] = headers
-        exec(self.globals['main'].__code__, self.globals)
+        available_content = {
+            'print': verlog.name(self.func.__name__),
+            'response': response,
+            'url': url,
+            'data': data,
+            'headers': headers
+        }
+        kwargs = {}
+        for name in self.func_args_names:
+            if name in available_content:
+                kwargs[name] = available_content[name]
+        try:
+            self.func(**kwargs)
+        except TypeError as e:
+            verlog.name(self.func.__name__)(f"RuntimeError: {e}", level = logging.ERROR)
+            ErrorStatu(self, 500, 'Internal Server Error')
 
 
 class daemon:

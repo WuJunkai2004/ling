@@ -1,7 +1,14 @@
-from imp  import load_source
+try:
+    from imp import load_source
+except ImportError:
+    from importlib.util import spec_from_file_location, module_from_spec
+    load_source = lambda name, path: module_from_spec(spec_from_file_location(name, path))
 
 import os
 import vercel
+
+# 模块缓存字典
+_module_cache = {}
 
 def main(handler = vercel.API, port = 8000):
     vercel.start(
@@ -29,11 +36,23 @@ class handler(vercel.API):
             return
 
         if(os.path.isfile(url + '.py')):
-            mod = load_source(url,url + '.py')
-            try:
-                mod.handler.vercel(self, url, data, headers)
-            except AttributeError:
-                vercel.ErrorStatu(self, 503)
+            mod = _module_cache.get(url)
+
+            if not mod:
+                try:
+                    mod = load_source(url, url + '.py')
+                    _module_cache[url] = mod
+                except Exception as e:
+                    if url in _module_cache:
+                        del _module_cache[url]
+                    vercel.verlog(f"Error loading module {url}: {e}")
+                    return vercel.ErrorStatu(self, 500)
+
+            if mod:
+                try:
+                    mod.handler.vercel(self, url, data, headers)
+                except AttributeError:
+                    vercel.ErrorStatu(self, 503)
             return
         
         vercel.ErrorStatu(self, 404)
