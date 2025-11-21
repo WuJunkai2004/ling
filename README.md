@@ -1,10 +1,12 @@
 # ling
 A Modern Paper Reader By PyQt5
 
+本项目推荐使用 `uv` 进行高效的依赖管理和包安装。
+
 ### Build
 using pyvenv
 ```bash
-pip install -r requirements.txt
+pip install .
 start.bat
 ```
 
@@ -24,7 +26,6 @@ ling
 - main.py: 主程序文件，程序的入口
 - start.bat: 启动脚本，编译ui文件并运行主程序
 - README.md: 项目说明文件
-- requirements.txt: python依赖文件列表
 - .gitignore: git忽略文件
 ```
 

@@ -1,4 +1,0 @@
-PyQt-Fluent-Widgets==1.7.7
-PyQtWebEngine==5.15.7
-requests==2.32.3
-dataset==1.6.2
