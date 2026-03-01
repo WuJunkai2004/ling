@@ -5,7 +5,6 @@ import os
 import dblite
 import vercel
 from langchain_community.document_loaders import PyMuPDFLoader
-import threading
 from langchain_community.embeddings import DashScopeEmbeddings
 from config import DASHSCOPE_API_KEY, EMBEDDING_MODEL
 from pydantic import BaseModel, Field
@@ -73,6 +72,7 @@ def process_pdf_to_vector(pdf_path):
 
 @vercel.daemon
 def increase_build_rag(pdf_path):
+    return
     """增加RAG构建任务"""
     from itext2kg import iText2KG
     from langchain.document_loaders import PyPDFLoader
@@ -151,8 +151,8 @@ def handler(response: vercel.API, url, data, headers):
         file_info = db['files']['filename'][find]
 
     # 启动异步处理
-    pdf_path = os.path.join('.', 'var', 'files', file_info)
-    increase_build_rag(pdf_path)
+    #pdf_path = os.path.join('.', 'var', 'files', file_info)
+    #increase_build_rag(pdf_path)
 
     response.send_code(200)
     response.send_headers({

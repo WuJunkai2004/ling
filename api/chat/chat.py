@@ -1,29 +1,24 @@
 import vercel
 import requests
 import dblite
-from langchain_chroma import Chroma
-from langchain_community.embeddings import DashScopeEmbeddings
-from config import (
-    DASHSCOPE_API_KEY,
-    DASHSCOPE_API_URL,
-    EMBEDDING_MODEL,
-    CHAT_MODEL
-)
 
-# 初始化 embedding 模型
-embedding = DashScopeEmbeddings(
-    model=EMBEDDING_MODEL,
-    dashscope_api_key=DASHSCOPE_API_KEY
-)
+import os
+import requests
+import json
 
-# 加载持久化的向量数据库
-vectordb = Chroma(
-    persist_directory='./var/vector_db',
-    embedding_function=embedding
-)
+API_URL = "https://api.gitcode.com/api/v5/chat/completions"
+headers = {
+    "Authorization": f"Bearer dZ_1jQfsohYYyqUCkWWCiQN4",
+}
 
-# 构建检索器
-retriever = vectordb.as_retriever(search_kwargs={"k": 3})
+def query(payload):
+    print("call query")
+    response = requests.post(API_URL, headers=headers, json=payload)
+    result = response.json()
+    if "choices" in result:
+        return result["choices"][0]["message"]["content"]
+    else:
+        return "Error: " + result.get("message", "Unknown error")
 
 def load_history(token):
     db = dblite.SQL('./var/datas.db')
@@ -46,10 +41,6 @@ def load_history(token):
 
 
 def quest(question, token):
-    headers = {
-        "Authorization": f"Bearer {DASHSCOPE_API_KEY}",
-        "Content-Type": "application/json"
-    }
     content = []
     content.append({
         "role": "system",
@@ -71,30 +62,15 @@ def quest(question, token):
         "role": "user",
         "content": f"根据以上历史记录，请回答问题：{question}"
     })
-
-    docs = retriever.invoke(question)
-    messages.append({
-        "role": "system",
-        "content": f"这是检索到的内容：{str(docs)}"
-    })
     
     payload = {
-        "model": CHAT_MODEL,
         "messages": messages,
+        "model": "deepseek-ai/DeepSeek-V3.2",
+        "stream": False
     }
-    try:
-        req = requests.post(DASHSCOPE_API_URL,
-                            headers=headers,
-                            json=payload,
-                            timeout=10)
-        req = req.json()
-    except Exception as e:
-        print(f"Failed to connect to DashScope API due to {e}")
-        return {
-            "success": False,
-            "response": {}
-        }
+    req = query(payload)
     print(f"Request to DashScope API: {req}")
+    print("will return")
     return {
         "success": True,
         "response": req
@@ -152,9 +128,10 @@ please answer the question:
 """
     token = data["token"]
     result = quest(question, token)
-    if not result["success"] or not result["response"]["choices"]:
+    print(f"quest result: {result}")
+    if not result["success"] or not result["response"]:
         return failed_response(response, 500)
-    answer = result["response"]["choices"][0]["message"]["content"]
+    answer = result["response"]
     db = dblite.SQL('./var/datas.db')
     db[token].insert(data["msg"], answer)
     db.close()

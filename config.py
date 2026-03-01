@@ -7,3 +7,4 @@ DASHSCOPE_API_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/comp
 # Model configurations
 EMBEDDING_MODEL = "text-embedding-v1"
 CHAT_MODEL = "qwen-turbo"
+
